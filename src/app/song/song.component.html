@@ -1,0 +1,12 @@
+<div class="song">
+  <span *ngIf="song.user">
+    <!-- Display User Avatar -->
+    {{ song.user }}
+  </span>
+  <span>
+    {{ song.title }}
+  </span>
+  <span *ngIf="song.artist">
+    {{ song.artist }}
+  </span>
+</div>

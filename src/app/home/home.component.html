@@ -1,0 +1,64 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <form class="form-inline">
+    <input
+      class="form-control mr-sm-2"
+      type="search"
+      placeHolder="Search"
+      aria-label="Search"
+      (keypress.submit)="({})"
+    />
+  </form>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <a class="navbar-brand">
+      User Avatar
+    </a>
+    <a class="navbar-brand">Server Logo</a>
+    <div class="dropdown">
+      <button
+        class="btn btn-dark dropdown-toggle"
+        type="button"
+        id="serverMenuButton"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        Server
+      </button>
+      <div class="dropdown-menu" aria-labelledby="serverMenuButton">
+        <a class="dropdown-item">Server 1</a>
+        <a class="dropdown-item">Server 2</a>
+      </div>
+    </div>
+  </div>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+</nav>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-4"><app-lists></app-lists></div>
+    <div class="col-sm-4">
+      <div *ngIf="authenticated">
+        <div *ngIf="selectedList">
+          <app-list></app-list>
+        </div>
+        <div *ngIf="!selectedList">
+          <app-music-player></app-music-player>
+        </div>
+      </div>
+      <div *ngIf="!authenticated">
+        <app-login></app-login>
+      </div>
+    </div>
+    <div class="col-sm-4"><app-queue></app-queue></div>
+  </div>
+</div>
+<nav class="navbar fixed-bottom navbar-dark bg-dark">Music Player</nav>

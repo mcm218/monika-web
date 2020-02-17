@@ -1,0 +1,7 @@
+<div class="list-group" *ngIf="playlists">
+  <div class="playlist list-group-item" *ngFor="let playlist of playlists">
+    <!-- Source Logo -->
+    <!-- Playlist Title -->
+    {{ playlist.source }} - {{ playlist.title }}
+  </div>
+</div>
