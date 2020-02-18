@@ -1,3 +1,18 @@
-<p>
-  music-player works!
-</p>
+<div class="card">
+  <img [src]="song.thumbnail" class="card-img-top" />
+  <div id="block"></div>
+  <div id="title">{{ song.title }}</div>
+  <div id="artist">{{ song.artist }}</div>
+
+  <!-- <div class="card-body">
+    <div class="row">
+      <div class="col mx-auto"></div>
+      <button><fa-icon [icon]="faRandom" size="lg"></fa-icon></button>
+      <button><fa-icon [icon]="faBackward" size="lg"></fa-icon></button>
+      <button><fa-icon [icon]="faPlay" size="lg"></fa-icon></button>
+      <button><fa-icon [icon]="faForward" size="lg"></fa-icon></button>
+      <button><fa-icon [icon]="faRedo" size="lg"></fa-icon></button>
+      <div class="col mx-auto"></div>
+    </div>
+  </div> -->
+</div>

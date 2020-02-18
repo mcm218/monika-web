@@ -1,0 +1,10 @@
+.song {
+  padding: 5px;
+  background-color: #161616;
+  border-radius: 0;
+  color: white;
+}
+.list-group {
+  height: 100%;
+  background-color: #161616;
+}

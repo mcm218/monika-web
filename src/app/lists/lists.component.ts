@@ -1,32 +1,24 @@
-import { Component, OnInit } from '@angular/core';
-import { Playlist } from '../db.service';
+import { Component, OnInit, Input } from "@angular/core";
+import { Playlist, DbService } from "../db.service";
+import { faYoutube, faSpotify } from "@fortawesome/free-brands-svg-icons";
+import { faCloud } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
-  selector: 'app-lists',
-  templateUrl: './lists.component.html',
-  styleUrls: ['./lists.component.css']
+  selector: "app-lists",
+  templateUrl: "./lists.component.html",
+  styleUrls: ["./lists.component.css"]
 })
 export class ListsComponent implements OnInit {
-  playlists: Playlist[];
-  constructor() { }
+  @Input() playlists: Playlist[];
+  faYoutube = faYoutube;
+  faSpotify = faSpotify;
+  faCloud = faCloud;
 
-  ngOnInit() {
-    this.playlists = [];
-    this.playlists.push({
-      list: [],
-      source: "Spotify",
-      title: "Top Tracks"
-    });
-    this.playlists.push({
-      list: [],
-      source: "Youtube",
-      title: "Music"
-    });
-    this.playlists.push({
-      list: [],
-      source: "Firestore",
-      title: "History"
-    });
+  constructor(private db: DbService) {}
+
+  ngOnInit() {}
+
+  selectList(playlist: Playlist) {
+    this.db.selectList(playlist);
   }
-
 }

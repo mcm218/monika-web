@@ -10,7 +10,5 @@ export class SongComponent implements OnInit {
   @Input() song: Song;
   constructor() {}
 
-  ngOnInit() {
-    console.log(this.song);
-  }
+  ngOnInit() {}
 }

@@ -1,4 +1,45 @@
-.container-fluid{
-    text-align: center;
-    padding: 0;
+.row {
+  text-align: center;
+  padding: 0;
+  margin: 50px 0;
+}
+.container-fluid {
+  height: 100%;
+  background-color: rgb(22, 22, 22);
+  margin: 0;
+  padding: 0;
+}
+.col-sm-4 {
+  margin: 0;
+  padding: 0;
+}
+.navbar,
+.wide {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+.panel {
+  max-width: 300px;
+  font-size: small;
+}
+.nav-item {
+  padding-left: 5px;
+}
+.btn {
+  background-color: #e16035;
+}
+.navbar,
+.navbar-collapse {
+  background-color: #131313;
+}
+input,
+input:focus {
+  background-color: #161616;
+  color: #e16035;
+  border: none;
+  font-size: small;
+}
+input:focus {
+  background-color: #131313;
 }

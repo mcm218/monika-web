@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-1">
+    <img
+      class="thumbnail"
+      alt="Album Cover"
+      src="https://i.scdn.co/image/ab67616d0000b27396e554b2799b4452e026e20e"
+    />
+  </div>
+  <div class="col-3 my-auto">
+    <p>Mom Jeans</p>
+    <p class="artist">Mickie Darling</p>
+  </div>
+  <div class="col-4 my-auto controls">
+    <button><fa-icon [icon]="faRandom"></fa-icon></button>
+    <button><fa-icon [icon]="faBackward"></fa-icon></button>
+    <button><fa-icon [icon]="faPlay" size="lg"></fa-icon></button>
+    <button><fa-icon [icon]="faForward"></fa-icon></button>
+    <button><fa-icon [icon]="faRedo"></fa-icon></button>
+  </div>
+  <div id="slidercontainer" class="col-4 my-auto">
+    <input
+      type="range"
+      min="0"
+      max="30"
+      value="15"
+      class="slider"
+      id="myRange"
+    />
+  </div>
+</div>

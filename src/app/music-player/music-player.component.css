@@ -1,0 +1,30 @@
+.card {
+  background-color: #161616;
+  max-width: 400px;
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+#title {
+  position: absolute;
+  top: 80%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+#artist {
+  position: absolute;
+  top: 90%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: #e16035;
+}
+#block {
+  position: absolute;
+  height: 25%;
+  top: 75%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}

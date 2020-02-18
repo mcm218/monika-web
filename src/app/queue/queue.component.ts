@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { Song } from "../db.service";
+import { Component, OnInit, Input } from "@angular/core";
+import { Song, DbService } from "../db.service";
 
 @Component({
   selector: "app-queue",
@@ -7,31 +7,8 @@ import { Song } from "../db.service";
   styleUrls: ["./queue.component.css"]
 })
 export class QueueComponent implements OnInit {
-  queue: Song[];
-  constructor() {}
+  @Input() queue: Song[];
+  constructor(private db: DbService) {}
 
-  ngOnInit() {
-    this.queue = [];
-    this.queue.push({
-      id: "",
-      thumbnail: "",
-      title: "Come in",
-      url: "youtube.com",
-      artist: "Weatherday",
-      user: "Me"
-    });
-    this.queue.push({
-      id: "",
-      thumbnail: "",
-      title: "pretty cvnt",
-      url: "youtube.com",
-      artist: "Sewerslvt"
-    });
-    this.queue.push({
-      id: "",
-      thumbnail: "",
-      title: "Youtube Video",
-      url: "youtube.com"
-    });
-  }
+  ngOnInit() {}
 }

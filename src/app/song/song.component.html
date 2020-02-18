@@ -1,12 +1,14 @@
-<div class="song">
-  <span *ngIf="song.user">
-    <!-- Display User Avatar -->
-    {{ song.user }}
-  </span>
-  <span>
-    {{ song.title }}
-  </span>
-  <span *ngIf="song.artist">
-    {{ song.artist }}
-  </span>
+<div class="row">
+  <img
+    class="col"
+    width="50px"
+    class="avatar"
+    src="https://cdn.discordapp.com/icons/523720897593606155/c779e1b973dbaae7726654c9d2d818e4"
+  />
+  <div class="col">
+    <div class="row row-cols-1">
+      <span>{{ song.title }}</span>
+      <span class="artist" *ngIf="song.artist">{{ song.artist }}</span>
+    </div>
+  </div>
 </div>

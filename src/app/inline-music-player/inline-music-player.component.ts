@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import {
   faPlay,
   faForward,
@@ -7,21 +7,19 @@ import {
   faRedo,
   faPause
 } from "@fortawesome/free-solid-svg-icons";
-import { Song } from "../db.service";
+
 @Component({
-  selector: "app-music-player",
-  templateUrl: "./music-player.component.html",
-  styleUrls: ["./music-player.component.css"]
+  selector: "app-inline-music-player",
+  templateUrl: "./inline-music-player.component.html",
+  styleUrls: ["./inline-music-player.component.css"]
 })
-export class MusicPlayerComponent implements OnInit {
-  @Input() song: Song;
+export class InlineMusicPlayerComponent implements OnInit {
   faPlay = faPlay;
   faForward = faForward;
   faRandom = faRandom;
   faBackward = faBackward;
   faRedo = faRedo;
   faPause = faPause;
-
   constructor() {}
 
   ngOnInit() {}

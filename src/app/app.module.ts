@@ -11,6 +11,8 @@ import { MusicPlayerComponent } from './music-player/music-player.component';
 import { ListComponent } from './list/list.component';
 import { LoginComponent } from './login/login.component';
 import { SongComponent } from './song/song.component';
+import { InlineMusicPlayerComponent } from './inline-music-player/inline-music-player.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
    declarations: [
@@ -22,11 +24,13 @@ import { SongComponent } from './song/song.component';
       ListComponent,
       LoginComponent,
       SongComponent,
-      FontAwesomeModule
+      InlineMusicPlayerComponent,
+      SettingsComponent
    ],
    imports: [
       BrowserModule,
-      AppRoutingModule
+      AppRoutingModule,
+      FontAwesomeModule
    ],
    providers: [],
    bootstrap: [

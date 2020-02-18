@@ -1,15 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from "@angular/core";
+import { Playlist, DbService } from "../db.service";
+import {
+  faHeart as faSolidHeart,
+  faPlus,
+  faTimes
+} from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-regular-svg-icons";
 
 @Component({
-  selector: 'app-list',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.css']
+  selector: "app-list",
+  templateUrl: "./list.component.html",
+  styleUrls: ["./list.component.css"]
 })
 export class ListComponent implements OnInit {
+  @Input() playlist: Playlist;
 
-  constructor() { }
+  faHeart = faHeart;
+  faPlus = faPlus;
+  faTimes = faTimes;
+  faSolidHeart = faSolidHeart;
 
-  ngOnInit() {
+  constructor(private db: DbService) {}
+
+  ngOnInit() {}
+
+  deselectList() {
+    this.db.deselectList();
   }
-
 }
