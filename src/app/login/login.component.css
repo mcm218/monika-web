@@ -1,6 +1,14 @@
-.container{
-    color: white;
+.card {
+  max-width: 300px;
+  padding: 20px;
 }
-.bg{
-    background-color: #131313;
+.card-body {
+  color: white;
+}
+a,
+a:hover {
+  text-decoration: none;
+}
+.bg {
+  background-color: #131313;
 }

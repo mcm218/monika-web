@@ -1,21 +1,40 @@
-<div class="row">
+<div class="row" *ngIf="song">
   <div class="col-1">
-    <img
-      class="thumbnail"
-      alt="Album Cover"
-      src="https://i.scdn.co/image/ab67616d0000b27396e554b2799b4452e026e20e"
-    />
+    <img class="thumbnail" [src]="song.thumbnail" />
   </div>
   <div class="col-3 my-auto">
-    <p>Mom Jeans</p>
-    <p class="artist">Mickie Darling</p>
+    <p>{{ song.title }}</p>
+    <p class="artist">{{ song.artist }}</p>
   </div>
   <div class="col-4 my-auto controls">
+    <!-- Shuffle -->
     <button><fa-icon [icon]="faRandom"></fa-icon></button>
+    <!-- Previous -->
     <button><fa-icon [icon]="faBackward"></fa-icon></button>
-    <button><fa-icon [icon]="faPlay" size="lg"></fa-icon></button>
+    <!-- Pause/Play -->
+    <div *ngIf="controller.pauseState; else elseBlock">
+      <button><fa-icon [icon]="faPause" size="lg"></fa-icon></button>
+    </div>
+    <ng-template #elseBlock>
+      <button>
+        <fa-icon [icon]="faPlay" size="lg"></fa-icon>
+      </button>
+    </ng-template>
+    <!-- Skip -->
     <button><fa-icon [icon]="faForward"></fa-icon></button>
-    <button><fa-icon [icon]="faRedo"></fa-icon></button>
+    <!-- Loop -->
+    <ng-container *ngIf="controller.loop == 0; else elseIfBlock">
+      <button><fa-icon [icon]="faRedo"></fa-icon></button>
+    </ng-container>
+    <ng-template #elseIfBlock
+      ><ng-container *ngIf="controller.loop == 1; else elseBlock">
+        <button>
+          <fa-icon [icon]="faRedo" class="active"></fa-icon>
+        </button> </ng-container
+    ></ng-template>
+    <ng-template #elseBlock>
+      <button><fa-icon [icon]="faRedo" class="active"></fa-icon></button>
+    </ng-template>
   </div>
   <div id="slidercontainer" class="col-4 my-auto">
     <input

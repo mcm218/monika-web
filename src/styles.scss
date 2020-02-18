@@ -5,6 +5,7 @@ html {
 }
 body {
   height: calc(100% - 110px);
+  background-image: linear-gradient(#353535, #131313);
 }
 
 .avatar {
@@ -24,9 +25,9 @@ button {
   color: white;
 }
 .card {
-//   max-width: 400px;
+  //   max-width: 400px;
   margin: 16px auto;
-  background-color: #131313;
+  background-color: rgba(0, 0, 0, 0);
   color: white;
 }
 p {

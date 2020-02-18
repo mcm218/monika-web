@@ -1,6 +1,10 @@
 <div class="card bg" *ngIf="playlist">
   <div class="row">
-    <div class="col-11"></div>
+    <div class="col-11">
+      <h2>
+        {{ playlist.title }}
+      </h2>
+    </div>
     <button class="col-1 my-auto" (click)="deselectList()">
       <fa-icon [icon]="faTimes"></fa-icon>
     </button>
@@ -8,10 +12,15 @@
   <div *ngFor="let song of playlist.songs">
     <div class="row">
       <button class="col-1 my-auto"><fa-icon [icon]="faPlus"></fa-icon></button>
-      <span class="col-5 my-auto">{{ song.title }}</span>
-      <span class="col-5 my-auto">{{ song.artist }}</span>
-      <button class="col-1 my-auto">
-        <fa-icon [icon]="faHeart"></fa-icon>
+      <span class="col-6 my-auto">{{ song.title }}</span>
+      <span class="col-4 my-auto">{{ song.artist }}</span>
+      <button class="col-1 my-auto" (click)="toggleFavorite(song)">
+        <div *ngIf="isFavorite(song.id); else elseBlock">
+          <fa-icon [icon]="faSolidHeart" class="active"></fa-icon>
+        </div>
+        <ng-template #elseBlock>
+          <fa-icon [icon]="faHeart"></fa-icon>
+        </ng-template>
       </button>
     </div>
     <hr />

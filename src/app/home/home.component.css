@@ -5,7 +5,7 @@
 }
 .container-fluid {
   height: 100%;
-  background-color: rgb(22, 22, 22);
+  background-color: rgb(22, 22, 22, 0);
   margin: 0;
   padding: 0;
 }
@@ -27,19 +27,39 @@
   padding-left: 5px;
 }
 .btn {
-  background-color: #e16035;
+  background-color: #353535;
+  color: white;
+}
+.btn:focus {
+  background-color: #131313;
 }
 .navbar,
 .navbar-collapse {
+  background-color: #353535;
+}
+.bottom-bar{
   background-color: #131313;
 }
 input,
 input:focus {
-  background-color: #161616;
+  background-color: #353535;
   color: #e16035;
   border: none;
+  border-bottom: 1px solid #131313;
+  border-radius: 5px 5px 0 0;
   font-size: small;
 }
 input:focus {
+  background-color: #131313;
+}
+.dropdown-menu {
+  padding: 0;
+  background-color: #353535;
+  color: white;
+}
+.dropdown-item {
+  padding: 10px;
+}
+.dropdown-item:hover {
   background-color: #131313;
 }

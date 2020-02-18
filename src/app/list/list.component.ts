@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { Playlist, DbService } from "../db.service";
+import { Playlist, DbService, Song } from "../db.service";
 import {
   faHeart as faSolidHeart,
   faPlus,
@@ -26,5 +26,12 @@ export class ListComponent implements OnInit {
 
   deselectList() {
     this.db.deselectList();
+  }
+
+  isFavorite(id: string): boolean {
+    return this.db.isFavorite(id);
+  }
+  toggleFavorite(song: Song) {
+    this.db.toggleFavorite(song);
   }
 }

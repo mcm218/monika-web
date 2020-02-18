@@ -1,9 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { AuthService } from "../auth.service";
-import { DbService, Playlist, Song } from "../db.service";
+import { DbService, Playlist, Song, MusicController } from "../db.service";
 import { faCog, faHome } from "@fortawesome/free-solid-svg-icons";
-import { LoginComponent } from "../login/login.component";
-import { MusicPlayerComponent } from "../music-player/music-player.component";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: "app-home",
@@ -18,34 +17,59 @@ export class HomeComponent implements OnInit {
   selectedList: Playlist;
   queue: Song[];
   currentSong: Song;
+  controller: MusicController;
+  user: any;
 
   settings: boolean = false;
 
   faCog = faCog;
   faHome = faHome;
 
-  constructor(private auth: AuthService, private db: DbService) {
-    this.auth.authenticated.subscribe(authenticated => {
-      this.authenticated = authenticated;
-      if (authenticated) {
-        console.info("User Authenticated");
-        this.db.getQueue();
-        this.db.getPlaylists();
+  constructor(
+    private auth: AuthService,
+    private db: DbService,
+    private route: ActivatedRoute
+  ) {
+    this.auth.guildVerified.subscribe(guildVerified => {
+      this.authenticated = guildVerified;
+      if (guildVerified) {
         this.auth.servers.subscribe(servers => (this.servers = servers));
-        this.auth.selectedServer.subscribe(
-          server => (this.selectedServer = server)
+        this.auth.selectedServer.subscribe(server => {
+          this.selectedServer = server;
+          this.db.getMusicPlayerData();
+        });
+        this.db.queue.subscribe(queue => (this.queue = queue));
+        this.db.controller.subscribe(
+          controller => (this.controller = controller)
         );
+        this.db.currentSong.subscribe(song => (this.currentSong = song));
+      }
+    });
+    this.auth.user.subscribe(user => {
+      if (user) {
+        this.user = user;
+        this.db.getLists();
         this.db.playlists.subscribe(playlists => (this.playlists = playlists));
         this.db.selectedList.subscribe(list => (this.selectedList = list));
-        this.db.queue.subscribe(queue => (this.queue = queue));
-        this.db.currentSong.subscribe(song => (this.currentSong = song));
-      } else {
-        console.info("User Not Authenticated");
       }
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      const code = params["code"];
+      if (code && !this.auth.authenticated.value) {
+        const url = window.location.href.split("?")[0];
+        //authorize discord
+        this.auth.authorizeDiscord(url, code);
+      } else if (code) {
+        //authorize spoitfy
+        //this.auth.authorizeSpotify();
+      } else {
+        this.auth.authorizeDiscord();
+      }
+    });
+  }
 
   selectServer(server: any): void {
     this.auth.selectServer(server);

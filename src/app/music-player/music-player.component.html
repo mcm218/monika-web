@@ -1,4 +1,4 @@
-<div class="card">
+<div *ngIf="song" class="card">
   <img [src]="song.thumbnail" class="card-img-top" />
   <div id="block"></div>
   <div id="title">{{ song.title }}</div>

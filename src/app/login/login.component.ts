@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
-import { AuthService } from '../auth.service';
+import { AuthService } from "../auth.service";
+import { environment } from "src/environments/environment";
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
@@ -8,11 +9,16 @@ import { AuthService } from '../auth.service';
 })
 export class LoginComponent implements OnInit {
   faDiscord = faDiscord;
+  discordUrl;
   constructor(private auth: AuthService) {}
 
-  ngOnInit() {}
-
-  authenticate(){
-    this.auth.authenticate();
+  ngOnInit() {
+    var url = window.location.href.split("?")[0];
+    this.discordUrl =
+      "https://discordapp.com/api/oauth2/authorize?client_id=" +
+      environment.discordData.client_id +
+      "&redirect_uri=" +
+      url +
+      "&response_type=code&scope=identify%20guilds";
   }
 }

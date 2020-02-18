@@ -62,3 +62,6 @@ p {
   background: #e16035; /* Green background */
   cursor: pointer; /* Cursor on hover */
 }
+.active {
+  color: #e16035;
+}

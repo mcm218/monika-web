@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import {
   faPlay,
   faForward,
@@ -7,6 +7,7 @@ import {
   faRedo,
   faPause
 } from "@fortawesome/free-solid-svg-icons";
+import { MusicController, Song } from '../db.service';
 
 @Component({
   selector: "app-inline-music-player",
@@ -14,6 +15,9 @@ import {
   styleUrls: ["./inline-music-player.component.css"]
 })
 export class InlineMusicPlayerComponent implements OnInit {
+  @Input() controller: MusicController;
+  @Input() song: Song;
+  
   faPlay = faPlay;
   faForward = faForward;
   faRandom = faRandom;

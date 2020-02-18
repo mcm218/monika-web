@@ -1,12 +1,12 @@
 <div class="container-fluid">
-  <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg">
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+  <nav class="gradient navbar fixed-top navbar-expand-lg">
+    <div class="gradient collapse navbar-collapse" id="navbarSupportedContent">
       <button *ngIf="authenticated" (click)="openSettings()">
         <fa-icon [icon]="settings ? faHome : faCog"></fa-icon>
       </button>
-      <div *ngIf="servers" class="dropdown nav-item">
+      <div *ngIf="selectedServer" class="dropdown nav-item">
         <button
-          class="btn btn-dark dropdown-toggle nav-item"
+          class="btn dropdown-toggle nav-item"
           type="button"
           id="serverMenuButton"
           data-toggle="dropdown"
@@ -25,12 +25,22 @@
         </div>
       </div>
       <a *ngIf="selectedServer" class="navbar-brand nav-item">
-        <img class="avatar" [src]="selectedServer.thumbnail" />
-      </a>
-      <a class="navbar-brand nav-item">
         <img
           class="avatar"
-          src="https://cdn.discordapp.com/icons/523720897593606155/c779e1b973dbaae7726654c9d2d818e4"
+          [src]="
+            'https://cdn.discordapp.com/icons/' +
+            selectedServer.id +
+            '/' +
+            selectedServer.icon
+          "
+        />
+      </a>
+      <a *ngIf="user" class="navbar-brand nav-item">
+        <img
+          class="avatar"
+          [src]="
+            'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar
+          "
         />
       </a>
     </div>
@@ -56,7 +66,7 @@
     </form>
   </nav>
   <div class="row" style="height: 100%;">
-    <div class="col-md-4 col-6 order-md-1 panel">
+    <div class="col-md-3 col-6 order-md-1 panel">
       <app-lists [playlists]="playlists"></app-lists>
     </div>
     <div class="col-md col-sm-12 order-md-2 order-first">
@@ -80,11 +90,15 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4 col-6 order-md-3 panel">
+    <div class="col-md-3 col-6 order-md-3 panel">
       <app-queue [queue]="queue"></app-queue>
     </div>
   </div>
-  <nav class="navbar fixed-bottom navbar-dark bg">
-    <app-inline-music-player class="wide"></app-inline-music-player>
+  <nav class="navbar bottom-bar fixed-bottom navbar-dark bg">
+    <app-inline-music-player
+      [song]="currentSong"
+      [controller]="controller"
+      class="wide"
+    ></app-inline-music-player>
   </nav>
 </div>

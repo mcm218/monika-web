@@ -1,11 +1,11 @@
 .playlist {
   text-align: start;
   padding: 5px;
-  background-color: #161616;
-  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
   color: white;
 }
 .list-group {
   height: 100%;
-  background-color: #161616;
+  background-color: rgba(0, 0, 0, 0);
 }
