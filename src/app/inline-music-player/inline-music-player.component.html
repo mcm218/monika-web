@@ -1,12 +1,12 @@
-<div class="row" *ngIf="song">
-  <div class="col-1">
+<div class="row">
+  <div class="col-1" *ngIf="song">
     <img class="thumbnail" [src]="song.thumbnail" />
   </div>
-  <div class="col-3 my-auto">
+  <div class="col-3 my-auto" *ngIf="song">
     <p>{{ song.title }}</p>
     <p class="artist">{{ song.artist }}</p>
   </div>
-  <div class="col-4 my-auto controls">
+  <div class="col-4 my-auto controls" *ngIf="song">
     <!-- Shuffle -->
     <button (click)="shuffle()"><fa-icon [icon]="faRandom"></fa-icon></button>
     <!-- Previous -->
@@ -38,7 +38,7 @@
       </ng-template>
     </button>
   </div>
-  <div id="slidercontainer" class="col-4 my-auto">
+  <div id="slidercontainer" class="col-4 my-auto" *ngIf="song">
     <input
       type="range"
       min="0"

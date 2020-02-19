@@ -1,5 +1,6 @@
 .row {
   width: 100%;
+  min-height: 60px;
 }
 .col,
 .col-1,
