@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { Song, DbService } from "../db.service";
+import { Song } from "../db.service";
 
 @Component({
   selector: "app-queue",
@@ -8,7 +8,8 @@ import { Song, DbService } from "../db.service";
 })
 export class QueueComponent implements OnInit {
   @Input() queue: Song[];
-  constructor(private db: DbService) {}
+
+  constructor() {}
 
   ngOnInit() {}
 }

@@ -1,7 +1,7 @@
 .row {
   text-align: center;
-  padding: 0;
-  margin: 50px 0;
+  margin: 0;
+  padding: 50px 0;
 }
 .container-fluid {
   height: 100%;
@@ -37,16 +37,15 @@
 .navbar-collapse {
   background-color: #353535;
 }
-.bottom-bar{
+.bottom-bar {
   background-color: #131313;
 }
 input,
 input:focus {
+  max-width: 300px;
   background-color: #353535;
   color: #e16035;
   border: none;
-  border-bottom: 1px solid #131313;
-  border-radius: 5px 5px 0 0;
   font-size: small;
 }
 input:focus {

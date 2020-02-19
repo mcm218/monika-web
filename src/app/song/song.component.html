@@ -1,14 +1,35 @@
-<div class="row">
+<div class="row my-auto">
   <img
+    *ngIf="song.user"
     class="col"
     width="50px"
     class="avatar"
-    src="https://cdn.discordapp.com/icons/523720897593606155/c779e1b973dbaae7726654c9d2d818e4"
+    [src]="
+      'https://cdn.discordapp.com/avatars/' +
+      song.user.id +
+      '/' +
+      song.user.avatar
+    "
   />
   <div class="col">
     <div class="row row-cols-1">
       <span>{{ song.title }}</span>
       <span class="artist" *ngIf="song.artist">{{ song.artist }}</span>
+    </div>
+  </div>
+  <div>
+    <div class="row row-cols-1">
+      <button (click)="toggleFavorite(song)">
+        <div *ngIf="isFavorite(song.id); else elseBlock">
+          <fa-icon [icon]="faSolidHeart"></fa-icon>
+        </div>
+        <ng-template #elseBlock>
+          <fa-icon [icon]="faHeart"></fa-icon>
+        </ng-template>
+      </button>
+      <button (click)="removeFromQueue()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
     </div>
   </div>
 </div>

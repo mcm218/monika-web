@@ -34,4 +34,8 @@ export class ListComponent implements OnInit {
   toggleFavorite(song: Song) {
     this.db.toggleFavorite(song);
   }
+
+  addToQueue(song: Song) {
+    this.db.addToQueue(song);
+  }
 }

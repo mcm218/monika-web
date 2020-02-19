@@ -1,5 +1,6 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
+import { ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -20,6 +21,7 @@ import { SongComponent } from "./song/song.component";
 import { InlineMusicPlayerComponent } from "./inline-music-player/inline-music-player.component";
 import { SettingsComponent } from "./settings/settings.component";
 import { environment } from "src/environments/environment";
+import { ResultsListComponent } from "./results-list/results-list.component";
 
 @NgModule({
   declarations: [
@@ -32,11 +34,13 @@ import { environment } from "src/environments/environment";
     LoginComponent,
     SongComponent,
     InlineMusicPlayerComponent,
-    SettingsComponent
+    SettingsComponent,
+    ResultsListComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    ReactiveFormsModule,
     FontAwesomeModule,
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),

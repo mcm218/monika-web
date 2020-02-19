@@ -1,15 +1,31 @@
-.playlist {
-  text-align: start;
-  /* direction: ltr; */
-  padding: 5px;
-  background-color: rgba(0, 0, 0, 0);
-  border: none;
-  color: white;
+.thumbnail {
+  max-height: 60px;
+  max-width: 60px;
 }
+.card {
+  max-width: 800px;
+  text-align: start;
+  margin: 16px auto;
+  padding: 5px;
+  background-color: #131313;
+  color: white;
+  font-size: small;
+}
+.row {
+  padding: 0px 10px;
+  margin: 5px 0px;
+}
+.button {
+  margin: 0;
+  padding: auto;
+}
+.active {
+  color: #e16035;
+}
+
 .list-group {
   /* direction: rtl; */
-  height: calc(100vh - 120px);
-  background-color: rgba(0, 0, 0, 0);
+  height: calc(100vh - 200px);
   overflow: hidden;
   overflow-y: scroll;
 }

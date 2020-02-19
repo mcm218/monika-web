@@ -5,3 +5,8 @@
 .artist {
   color: #e16035;
 }
+button,
+fa-icon {
+  padding: 0;
+  margin: 0;
+}

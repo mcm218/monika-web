@@ -9,20 +9,24 @@
       <fa-icon [icon]="faTimes"></fa-icon>
     </button>
   </div>
-  <div *ngFor="let song of playlist.songs">
-    <div class="row">
-      <button class="col-1 my-auto"><fa-icon [icon]="faPlus"></fa-icon></button>
-      <span class="col-6 my-auto">{{ song.title }}</span>
-      <span class="col-4 my-auto">{{ song.artist }}</span>
-      <button class="col-1 my-auto" (click)="toggleFavorite(song)">
-        <div *ngIf="isFavorite(song.id); else elseBlock">
-          <fa-icon [icon]="faSolidHeart" class="active"></fa-icon>
-        </div>
-        <ng-template #elseBlock>
-          <fa-icon [icon]="faHeart"></fa-icon>
-        </ng-template>
-      </button>
+  <div class="list-group">
+    <div *ngFor="let song of playlist.songs">
+      <div class="row">
+        <button class="col-1 my-auto" (click)="addToQueue(song)">
+          <fa-icon [icon]="faPlus"></fa-icon>
+        </button>
+        <span class="col-6 my-auto">{{ song.title }}</span>
+        <span class="col-4 my-auto">{{ song.artist }}</span>
+        <button class="col-1 my-auto" (click)="toggleFavorite(song)">
+          <div *ngIf="isFavorite(song.id); else elseBlock">
+            <fa-icon [icon]="faSolidHeart" class="active"></fa-icon>
+          </div>
+          <ng-template #elseBlock>
+            <fa-icon [icon]="faHeart"></fa-icon>
+          </ng-template>
+        </button>
+      </div>
+      <hr />
     </div>
-    <hr />
   </div>
 </div>

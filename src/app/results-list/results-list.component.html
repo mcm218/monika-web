@@ -1,0 +1,26 @@
+<div class="card bg">
+  <div class="row">
+    <div class="col-11">
+      <h2>
+        Results
+      </h2>
+    </div>
+    <button class="col-1 my-auto" (click)="back()">
+      <fa-icon [icon]="faTimes"></fa-icon>
+    </button>
+  </div>
+  <div class="list-group">
+    <a class="row" *ngFor="let result of results" (click)="addToQueue(result)">
+      <img
+        *ngIf="result.thumbnail"
+        class="col-3"
+        class="thumbnail"
+        [src]="result.thumbnail"
+      />
+      <div class="col-6 my-auto">{{ result.title }}</div>
+      <div class="col-4 my-auto artist" *ngIf="result.artist">
+        {{ result.artist }}
+      </div>
+    </a>
+  </div>
+</div>

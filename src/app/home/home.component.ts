@@ -3,6 +3,7 @@ import { AuthService } from "../auth.service";
 import { DbService, Playlist, Song, MusicController } from "../db.service";
 import { faCog, faHome } from "@fortawesome/free-solid-svg-icons";
 import { ActivatedRoute } from "@angular/router";
+import { FormControl } from "@angular/forms";
 
 @Component({
   selector: "app-home",
@@ -20,6 +21,9 @@ export class HomeComponent implements OnInit {
   controller: MusicController;
   user: any;
 
+  query = new FormControl("");
+
+  results: boolean = false;
   settings: boolean = false;
 
   faCog = faCog;
@@ -43,6 +47,10 @@ export class HomeComponent implements OnInit {
           controller => (this.controller = controller)
         );
         this.db.currentSong.subscribe(song => (this.currentSong = song));
+        this.db.results.subscribe(results => {
+          this.results = results && results.length > 0;
+        });
+        this.db.settings.subscribe(settings => (this.settings = settings));
       }
     });
     this.auth.user.subscribe(user => {
@@ -58,15 +66,15 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       const code = params["code"];
-      if (code && !this.auth.authenticated.value) {
-        const url = window.location.href.split("?")[0];
-        //authorize discord
-        this.auth.authorizeDiscord(url, code);
-      } else if (code) {
-        //authorize spoitfy
-        //this.auth.authorizeSpotify();
+      const accessToken = params["access_token"];
+      const url = window.location.href.split("?")[0];
+      if (code) {
+        //authorize discord spotify or discord
+        this.auth.authorize(url, code);
       } else {
         this.auth.authorizeDiscord();
+        this.auth.authorizeSpotify();
+        this.auth.authorizeYoutube();
       }
     });
   }
@@ -76,6 +84,10 @@ export class HomeComponent implements OnInit {
   }
 
   openSettings(): void {
-    this.settings = !this.settings;
+    this.db.toggleSettings();
+  }
+
+  search(): void {
+    this.db.searchSpotify(this.query.value);
   }
 }

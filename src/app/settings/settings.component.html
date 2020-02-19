@@ -1,11 +1,19 @@
 <div class="card bg">
-  <div class="card-body">
+  <div class="row">
+    <div class="col"></div>
+    <button class="col-1 my-auto" (click)="back()">
+      <fa-icon [icon]="faTimes"></fa-icon>
+    </button>
+  </div>
+  <div class="row mx-auto">
     <h4>Connect Accounts</h4>
-    <button (click)="authYoutube()">
+  </div>
+  <div class="row row-col-2">
+    <a class="mx-auto" [href]="youtubeUrl">
       <fa-icon [icon]="faYoutube" size="4x"></fa-icon>
-    </button>
-    <button (click)="authSpotify()">
+    </a>
+    <a class="mx-auto" [href]="spotifyUrl">
       <fa-icon [icon]="faSpotify" size="4x"></fa-icon>
-    </button>
+    </a>
   </div>
 </div>

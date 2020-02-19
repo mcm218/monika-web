@@ -8,40 +8,43 @@
   </div>
   <div class="col-4 my-auto controls">
     <!-- Shuffle -->
-    <button><fa-icon [icon]="faRandom"></fa-icon></button>
+    <button (click)="shuffle()"><fa-icon [icon]="faRandom"></fa-icon></button>
     <!-- Previous -->
-    <button><fa-icon [icon]="faBackward"></fa-icon></button>
+    <button (click)="prevSong()">
+      <fa-icon [icon]="faBackward"></fa-icon>
+    </button>
     <!-- Pause/Play -->
-    <div *ngIf="controller.pauseState; else elseBlock">
-      <button><fa-icon [icon]="faPause" size="lg"></fa-icon></button>
-    </div>
-    <ng-template #elseBlock>
-      <button>
+    <button (click)="togglePlay()">
+      <div *ngIf="controller.pauseState; else elseBlock">
+        <fa-icon [icon]="faPause" size="lg"></fa-icon>
+      </div>
+      <ng-template #elseBlock>
         <fa-icon [icon]="faPlay" size="lg"></fa-icon>
-      </button>
-    </ng-template>
+      </ng-template>
+    </button>
     <!-- Skip -->
-    <button><fa-icon [icon]="faForward"></fa-icon></button>
+    <button (click)="nextSong()"><fa-icon [icon]="faForward"></fa-icon></button>
     <!-- Loop -->
-    <ng-container *ngIf="controller.loop == 0; else elseIfBlock">
-      <button><fa-icon [icon]="faRedo"></fa-icon></button>
-    </ng-container>
-    <ng-template #elseIfBlock
-      ><ng-container *ngIf="controller.loop == 1; else elseBlock">
-        <button>
-          <fa-icon [icon]="faRedo" class="active"></fa-icon>
-        </button> </ng-container
-    ></ng-template>
-    <ng-template #elseBlock>
-      <button><fa-icon [icon]="faRedo" class="active"></fa-icon></button>
-    </ng-template>
+    <button (click)="toggleLoop()">
+      <ng-container *ngIf="controller.loop == 0; else loopElseIfBlock">
+        <fa-icon [icon]="faRedo"></fa-icon>
+      </ng-container>
+      <ng-template #loopElseIfBlock
+        ><ng-container *ngIf="controller.loop == 1; else loopElseBlock">
+          <fa-icon [icon]="faRedo" class="active"></fa-icon> </ng-container
+      ></ng-template>
+      <ng-template #loopElseBlock>
+        <fa-icon [icon]="faRedo" class="active"></fa-icon>
+      </ng-template>
+    </button>
   </div>
   <div id="slidercontainer" class="col-4 my-auto">
     <input
       type="range"
       min="0"
       max="30"
-      value="15"
+      (change)="changeVolume($event)"
+      [value]="controller.volume"
       class="slider"
       id="myRange"
     />

@@ -55,15 +55,14 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <form class="form-inline nav-item">
-      <input
-        class="form-control mr-sm-2"
-        type="search"
-        placeHolder="Search"
-        aria-label="Search"
-        (keypress.submit)="({})"
-      />
-    </form>
+    <input
+      class="form-control mr-sm-2"
+      type="search"
+      placeHolder="Search"
+      aria-label="Search"
+      [formControl]="query"
+      (keyup.enter)="search()"
+    />
   </nav>
   <div class="row" style="height: 100%;">
     <div class="col-md-3 col-6 order-md-1 panel">
@@ -71,24 +70,31 @@
     </div>
     <div class="col-md col-sm-12 order-md-2 order-first">
       <!-- Not Authenticated -->
-      <div *ngIf="!authenticated">
+      <div *ngIf="!authenticated; else settingsTab">
         <app-login></app-login>
       </div>
-      <!-- Authenticated -->
-      <div *ngIf="authenticated">
-        <!--  Settings tab -->
-        <div *ngIf="settings"><app-settings></app-settings></div>
-        <div *ngIf="!settings">
-          <!-- List Tab -->
-          <div *ngIf="selectedList">
-            <app-list [playlist]="selectedList"></app-list>
-          </div>
-          <!-- Music Player Tab -->
-          <div *ngIf="!selectedList">
-            <app-music-player [song]="currentSong"></app-music-player>
-          </div>
+      <!-- Settings Tab -->
+      <ng-template #settingsTab>
+        <div *ngIf="settings; else resultsTab">
+          <app-settings></app-settings>
         </div>
-      </div>
+        <!-- Results Tab -->
+        <ng-template #resultsTab>
+          <div *ngIf="results; else listTab">
+            <app-results-list></app-results-list>
+          </div>
+          <!-- List Tab -->
+          <ng-template #listTab>
+            <div *ngIf="selectedList; else musicPlayer">
+              <app-list [playlist]="selectedList"></app-list>
+            </div>
+            <!-- Music Player Tab -->
+            <ng-template #musicPlayer>
+              <app-music-player [song]="currentSong"></app-music-player>
+            </ng-template>
+          </ng-template>
+        </ng-template>
+      </ng-template>
     </div>
     <div class="col-md-3 col-6 order-md-3 panel">
       <app-queue [queue]="queue"></app-queue>

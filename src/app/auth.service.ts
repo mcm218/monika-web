@@ -4,7 +4,6 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { CookieService } from "ngx-cookie-service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { AngularFireAuth } from "@angular/fire/auth";
 import { environment } from "src/environments/environment";
 
 @Injectable({
@@ -13,6 +12,7 @@ import { environment } from "src/environments/environment";
 export class AuthService {
   discordTokenUrl = "https://discordapp.com/api/oauth2/token";
   spotifyTokenUrl = "https://accounts.spotify.com/api/token";
+  youtubeTokenUrl = "https://oauth2.googleapis.com/token";
 
   discordPath = "https://discordapp.com/api/";
 
@@ -24,15 +24,31 @@ export class AuthService {
   servers = new BehaviorSubject<any[]>(undefined);
   user = new BehaviorSubject<any>(undefined);
 
+  youtubeAccessToken: string;
   discordAccessToken: string;
+  spotifyAccessToken: string;
+
   constructor(
     private http: HttpClient,
     private cookieService: CookieService,
     private router: Router,
-    private afAuth: AngularFireAuth,
     private firestore: AngularFirestore
   ) {}
 
+  authorize(url: string, code: string): void {
+    if (this.cookieService.check("discord-token")) {
+      //authorize spotify
+      if (this.cookieService.check("spotify-token")) {
+        this.authorizeYoutube(url, code);
+      } else {
+        this.authorizeSpotify(url, code);
+      }
+      this.authorizeDiscord();
+    } else {
+      //authorize discord
+      this.authorizeDiscord(url, code);
+    }
+  }
   //Discord
 
   // Check if User is Discord Authorized
@@ -68,8 +84,6 @@ export class AuthService {
       .pipe()
       .subscribe(
         response => {
-          // await this.delay(200);
-          console.log(response);
           this.authenticated.next(true);
           this.discordAccessToken = response["access_token"];
           this.cookieService.set(
@@ -96,10 +110,6 @@ export class AuthService {
   // Refresh Discord Access Token
   discordRefreshToken() {
     var url = window.location.href;
-    var index = url.search(/login/i);
-    if (index == -1) {
-      url += "login";
-    }
     var body = new URLSearchParams();
     var refreshToken = this.cookieService.get("discord-refresh-token");
     body.set("client_id", environment.discordData.client_id);
@@ -116,10 +126,7 @@ export class AuthService {
       .pipe()
       .subscribe(
         response => {
-          // await this.delay(200);
           this.authenticated.next(true);
-          console.log(response);
-          console.log(response["access_token"]);
           this.discordAccessToken = response["access_token"];
           this.cookieService.set(
             "discord-token",
@@ -141,7 +148,7 @@ export class AuthService {
       );
   }
 
-  // Get
+  // Verify user is part of a valid server
   verifyServer(): void {
     console.log("Verifying guild membership...");
     var headers = new HttpHeaders({
@@ -191,7 +198,6 @@ export class AuthService {
       .get(this.discordPath + "users/@me", { headers: headers })
       .subscribe(
         response => {
-          // await this.delay(200);
           let user = response as any;
           this.createUser(user);
           this.user.next(user);
@@ -212,6 +218,181 @@ export class AuthService {
   }
 
   // Spotify
+  authorizeSpotify(url?: string, code?: string) {
+    console.log("Authorizing Spotify");
+    if (this.cookieService.check("spotify-token")) {
+      this.spotifyAccessToken = this.cookieService.get("spotify-token");
+      this.spotifyAuth.next(true);
+      return;
+    } else if (this.cookieService.check("spotify-refresh-token")) {
+      this.spotifyRefreshToken();
+      return;
+    } else if (!url || !code) {
+      return;
+    }
+    var body = new URLSearchParams();
+    body.set("client_id", environment.spotifyData.client_id);
+    body.set("client_secret", environment.spotifyData.client_secret);
+    body.set("grant_type", "authorization_code");
+    body.set("code", code);
+    body.set("redirect_uri", url);
+    body.set("scope", environment.spotifyData.scope);
+    var headers = new HttpHeaders({
+      "Content-Type": "application/x-www-form-urlencoded"
+    });
+    this.http
+      .post(this.spotifyTokenUrl, body.toString(), { headers: headers })
+      .pipe()
+      .subscribe(
+        response => {
+          this.spotifyAccessToken = response["access_token"];
+          this.spotifyAuth.next(true);
+          this.cookieService.set(
+            "spotify-token",
+            response["access_token"],
+            new Date(
+              new Date().getTime() + Number(response["expires_in"] * 1000)
+            )
+          );
+          this.cookieService.set(
+            "spotify-refresh-token",
+            response["refresh_token"]
+          );
+          this.router.navigate(["/"]);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+  }
+
+  spotifyRefreshToken() {
+    console.log("Refreshing Spotify Token...");
+    var body = new URLSearchParams();
+    var refreshToken = this.cookieService.get("spotify-refresh-token");
+    body.set("grant_type", "refresh_token");
+    body.set("refresh_token", refreshToken);
+    var headers = new HttpHeaders({
+      Authorization: `Basic ${btoa(
+        environment.spotifyData.client_id +
+          ":" +
+          environment.spotifyData.client_secret
+      )}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    });
+    this.http
+      .post(this.spotifyTokenUrl, body.toString(), { headers: headers })
+      .pipe()
+      .subscribe(
+        response => {
+          this.spotifyAccessToken = response["access_token"];
+          this.spotifyAuth.next(true);
+          this.cookieService.set(
+            "spotify-token",
+            response["access_token"],
+            new Date(
+              new Date().getTime() + Number(response["expires_in"] * 1000)
+            )
+          );
+          this.cookieService.set(
+            "spotify-refresh-token",
+            response["refresh_token"]
+          );
+        },
+        error => {
+          this.cookieService.delete("spotify-refresh-token");
+          console.log(error);
+        }
+      );
+  }
 
   // Youtube
+
+  authorizeYoutube(url?: string, code?: string): void {
+    console.log("Authorizing Youtube");
+    if (this.cookieService.check("youtube-token")) {
+      this.youtubeAccessToken = this.cookieService.get("youtube-token");
+      this.youtubeAuth.next(true);
+      return;
+    } else if (this.cookieService.check("youtube-refresh-token")) {
+      this.youtubeRefreshToken();
+      return;
+    } else if (!url || !code) {
+      return;
+    }
+    var body = new URLSearchParams();
+    body.set("client_id", environment.youtubeData.client_id);
+    body.set("client_secret", environment.youtubeData.client_secret);
+    body.set("grant_type", "authorization_code");
+    body.set("code", code);
+    body.set("redirect_uri", url);
+    var headers = new HttpHeaders({
+      "Content-Type": "application/x-www-form-urlencoded"
+    });
+    this.http
+      .post(this.youtubeTokenUrl, body.toString(), { headers: headers })
+      .pipe()
+      .subscribe(
+        response => {
+          console.log(response);
+          this.youtubeAccessToken = response["access_token"];
+          this.youtubeAuth.next(true);
+          this.cookieService.set(
+            "youtube-token",
+            response["access_token"],
+            new Date(
+              new Date().getTime() + Number(response["expires_in"] * 1000)
+            )
+          );
+          this.cookieService.set(
+            "youtube-refresh-token",
+            response["refresh_token"]
+          );
+          this.router.navigate(["/"]);
+        },
+        error => {
+          console.log(error);
+        }
+      );
+  }
+
+  youtubeRefreshToken(): void {
+    console.log("Refreshing Youtube Token...");
+    var body = new URLSearchParams();
+    var refreshToken = this.cookieService.get("youtube-refresh-token");
+    body.set("grant_type", "refresh_token");
+    body.set("refresh_token", refreshToken);
+    var headers = new HttpHeaders({
+      Authorization: `Basic ${btoa(
+        environment.youtubeData.client_id +
+          ":" +
+          environment.youtubeData.client_secret
+      )}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    });
+    this.http
+      .post(this.youtubeTokenUrl, body.toString(), { headers: headers })
+      .pipe()
+      .subscribe(
+        response => {
+          this.youtubeAccessToken = response["access_token"];
+          this.youtubeAuth.next(true);
+          this.cookieService.set(
+            "youtube-token",
+            response["access_token"],
+            new Date(
+              new Date().getTime() + Number(response["expires_in"] * 1000)
+            )
+          );
+          this.cookieService.set(
+            "youtube-refresh-token",
+            response["refresh_token"]
+          );
+        },
+        error => {
+          this.cookieService.delete("youtube-refresh-token");
+          console.log(error);
+        }
+      );
+  }
 }
