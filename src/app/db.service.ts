@@ -45,6 +45,7 @@ export class DbService {
     "&q=";
 
   spotifySearchPath = "https://api.spotify.com/v1/search?type=track&q=";
+  spotifyAlbumSearchPath = "https://api.spotify.com/v1/search?type=album&q=";
 
   youtubeVideoPath =
     "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&key=" +
@@ -58,6 +59,7 @@ export class DbService {
     "https://www.googleapis.com/youtube/v3/playlists?part=snippet%2CcontentDetails&maxResults=50&mine=true&key=" +
     environment.youtubeKey;
   spotifyPath = "https://api.spotify.com/v1/me/";
+  spotifyAlbumPath = "https://api.spotify.com/v1/albums/";
   selectedList = new BehaviorSubject<Playlist>(undefined);
   queue = new BehaviorSubject<Song[]>([]);
   currentSong = new BehaviorSubject<Song>(undefined);
@@ -115,14 +117,22 @@ export class DbService {
 
   addToQueue(song: Song) {
     if (song.source === "spotify") {
+      // Spotify Song
       this.addSpotifySong(song);
-      return;
+    } else if (song.source === "playlist") {
+      // Youtube Playlist
+      this.addYoutubePlaylist(song);
+    } else if (song.source === "album") {
+      // Spotify Album
+      this.addSpotifyAlbum(song);
+    } else {
+      // Youtube/Cached Song
+      this.pushSong(song);
+      song.user = this.auth.user.value;
+      const queue = this.queue.value;
+      queue.push(song);
+      this.updateQueue(queue);
     }
-    this.pushSong(song);
-    song.user = this.auth.user.value;
-    const queue = this.queue.value;
-    queue.push(song);
-    this.updateQueue(queue);
   }
   removeFromQueue(song: Song) {
     const queue = this.queue.value;
@@ -231,12 +241,17 @@ export class DbService {
   }
 
   cacheSearch(query: string, results: any, isVideo: boolean): void {
+    var ref;
     if (isVideo) {
-      const ref = this.firestore
-        .collection("searches/videos/spotify+" + query)
+      ref = this.firestore
+        .collection("searches/videos/" + query)
         .doc("results");
-      ref.set(results);
+    } else {
+      ref = this.firestore
+        .collection("searches/playlists/" + query)
+        .doc("results");
     }
+    ref.set(results);
   }
   // Spotify
   getSpotifyLists(): void {
@@ -253,7 +268,7 @@ export class DbService {
           let items = (response as any).items;
           for (i = 0; i < items.length; i++) {
             this.getSpotifyTracks(items[i]);
-            await this.delay(50);
+            await this.delay(100);
           }
         },
         error => console.error(error)
@@ -275,6 +290,9 @@ export class DbService {
             return;
           }
           items.forEach(item => {
+            if (!item.track) {
+              return;
+            }
             var song: Song = {
               title: item.track.name,
               artist: item.track.artists[0].name,
@@ -325,7 +343,7 @@ export class DbService {
             .subscribe(
               response => {
                 const result = (response as any).items[0];
-                this.cacheSearch(query, response, true);
+                this.cacheSearch("spotify+" + query, response, true);
                 //Turn into function?
                 song.id = result.id.videoId;
                 song.url = "https://www.youtube.com/watch?v=" + song.id;
@@ -371,7 +389,7 @@ export class DbService {
             .subscribe(
               response => {
                 const result = (response as any).items[0];
-                this.cacheSearch(query, response, true);
+                this.cacheSearch("spotify+" + query, response, true);
                 //Turn into function?
                 song.id = result.id.videoId;
                 song.url = "https://www.youtube.com/watch?v=" + song.id;
@@ -396,30 +414,87 @@ export class DbService {
   }
 
   searchSpotify(query: string): void {
-    const q = query.split(" ").join("+");
+    const q = query
+      .trim()
+      .split(" ")
+      .join("+");
+    var headers = new HttpHeaders({
+      Authorization: `Bearer ${this.auth.spotifyAccessToken}`
+    });
+    this.http.get(this.spotifySearchPath + q, { headers: headers }).subscribe(
+      response => {
+        const items = (response as any).tracks.items;
+        const results: Song[] = [];
+        items.forEach(track => {
+          // console.log(track.artists[0].name + " - " + track.name);
+          results.push({
+            source: "spotify",
+            title: track.name,
+            artist: track.artists[0].name,
+            data: track,
+
+            thumbnail: track.album.images[0]
+              ? track.album.images[0].url
+              : undefined
+          });
+        });
+        this.results.next(results);
+      },
+      error => console.log(error)
+    );
+  }
+
+  searchSpotifyAlbum(query: string): void {
+    const q = query
+      .trim()
+      .split(" ")
+      .join("+");
     var headers = new HttpHeaders({
       Authorization: `Bearer ${this.auth.spotifyAccessToken}`
     });
     this.http
-      .get(this.spotifySearchPath + query, { headers: headers })
+      .get(this.spotifyAlbumSearchPath + q, { headers: headers })
       .subscribe(
         response => {
-          const items = (response as any).tracks.items;
+          const items = (response as any).albums.items;
           const results: Song[] = [];
-          items.forEach(track => {
-            // console.log(track.artists[0].name + " - " + track.name);
+          items.forEach(album => {
             results.push({
-              source: "spotify",
-              title: track.name,
-              artist: track.artists[0].name,
-              data: track,
-
-              thumbnail: track.album.images[0]
-                ? track.album.images[0].url
-                : undefined
+              title: album.name,
+              thumbnail: album.images[0].url,
+              artist: album.artists[0].name,
+              source: "album",
+              id: album.id
             });
           });
           this.results.next(results);
+        },
+        error => console.log(error)
+      );
+  }
+
+  addSpotifyAlbum(album: Song): void {
+    // Get Album Tracks -> Format as Song -> addSpotifySong(song) on each
+    var headers = new HttpHeaders({
+      Authorization: `Bearer ${this.auth.spotifyAccessToken}`
+    });
+    this.http
+      .get(this.spotifyAlbumPath + album.id + "/tracks?limit=50", {
+        headers: headers
+      })
+      .subscribe(
+        async response => {
+          const tracks = (response as any).items;
+          for (let i = 0; i < tracks.length; i++) {
+            this.addSpotifySong({
+              source: "spotify",
+              thumbnail: album.thumbnail,
+              title: tracks[i].name,
+              artist: tracks[i].artists[0].name,
+              data: tracks[i]
+            });
+            await this.delay(200);
+          }
         },
         error => console.log(error)
       );
@@ -497,21 +572,237 @@ export class DbService {
       );
   }
   searchYoutube(query: string): void {
-    const q = query.split(" ").join("+");
-    this.http
-      .get(this.youtubeSearchPath + q + "+song" + "&type=video")
-      .subscribe(
-        response => {
-          const results = [];
-          (response as any).items.forEach(result => {
-            results.push(result);
+    const q = query
+      .trim()
+      .split(" ")
+      .join("+");
+    console.log(q);
+    this.firestore
+      .collection("searches/videos/" + q)
+      .doc("results")
+      .get()
+      .subscribe(snapshot => {
+        if (snapshot.exists) {
+          const results: Song[] = [];
+          const response = snapshot.data();
+
+          //Turn into function?
+          response.items.forEach(result => {
+            const thumbnails = result.snippet.thumbnails;
+            var thumbnail = thumbnails.high.url;
+            if (thumbnails.maxres) {
+              thumbnail = thumbnails.maxres.url;
+            } else if (thumbnails.standard) {
+              thumbnail = thumbnails.standard.url;
+            }
+            results.push({
+              source: "youtube",
+              title: result.snippet.title,
+              id: result.id.videoId,
+              url: "https://www.youtube.com/watch?v=" + result.id.videoId,
+              thumbnail: thumbnail
+            });
           });
           this.results.next(results);
-        },
-        error => console.error(error)
-      );
+        } else {
+          this.http
+            .get(this.youtubeSearchPath + q + "+song" + "&type=video")
+            .subscribe(
+              response => {
+                const results: Song[] = [];
+                this.cacheSearch(q, response, true);
+                // Cache search for later
+
+                //Turn into function?
+                (response as any).items.forEach(result => {
+                  const thumbnails = result.snippet.thumbnails;
+                  var thumbnail = thumbnails.high.url;
+                  if (thumbnails.maxres) {
+                    thumbnail = thumbnails.maxres.url;
+                  } else if (thumbnails.standard) {
+                    thumbnail = thumbnails.standard.url;
+                  }
+                  results.push({
+                    source: "youtube",
+                    title: result.snippet.title,
+                    id: result.id.videoId,
+                    url: "https://www.youtube.com/watch?v=" + result.id.videoId,
+                    thumbnail: thumbnail
+                  });
+                });
+                this.results.next(results);
+              },
+              error => console.error(error)
+            );
+        }
+      });
+  }
+
+  searchYoutubePlaylist(query: string): void {
+    const q = query
+      .trim()
+      .split(" ")
+      .join("+");
+    this.firestore
+      .collection("searches/playlists/" + q)
+      .doc("results")
+      .get()
+      .subscribe(snapshot => {
+        if (snapshot.exists) {
+          const results: Song[] = [];
+          const response = snapshot.data();
+
+          //Turn into function?
+          (response as any).items.forEach(result => {
+            const thumbnails = result.snippet.thumbnails;
+            var thumbnail = thumbnails.high.url;
+            if (thumbnails.maxres) {
+              thumbnail = thumbnails.maxres.url;
+            } else if (thumbnails.standard) {
+              thumbnail = thumbnails.standard.url;
+            }
+            results.push({
+              title: result.snippet.title,
+              source: "playlist",
+              thumbnail: thumbnail,
+              id: result.id.playlistId
+            });
+          });
+          this.results.next(results);
+        } else {
+          this.http
+            .get(this.youtubeSearchPath + q + "+album" + "&type=playlist")
+            .subscribe(
+              response => {
+                const results: Song[] = [];
+                // Cache search for later
+                this.cacheSearch(q, response, false);
+                //Turn into function?
+                (response as any).items.forEach(result => {
+                  const thumbnails = result.snippet.thumbnails;
+                  var thumbnail = thumbnails.high.url;
+                  if (thumbnails.maxres) {
+                    thumbnail = thumbnails.maxres.url;
+                  } else if (thumbnails.standard) {
+                    thumbnail = thumbnails.standard.url;
+                  }
+                  results.push({
+                    title: result.snippet.title,
+                    source: "playlist",
+                    thumbnail: thumbnail,
+                    id: result.id.playlistId
+                  });
+                });
+                this.results.next(results);
+              },
+              error => console.error(error)
+            );
+        }
+      });
+  }
+
+  addYoutubePlaylist(playlist: Song): void {
+    this.http.get(this.playlistPath + playlist.id).subscribe(
+      response => {
+        const items = (response as any).items;
+        if (items.length == 0) {
+          return;
+        }
+        items.forEach(item => {
+          const thumbnails = item.snippet.thumbnails;
+          var thumbnail;
+          if (!thumbnails) {
+            thumbnail = "";
+            return;
+          } else if (thumbnails.maxres) {
+            thumbnail = thumbnails.maxres.url;
+          } else if (thumbnails.standard) {
+            thumbnail = thumbnails.standard.url;
+          } else if (thumbnails.high) {
+            thumbnail = thumbnails.high.url;
+          }
+          this.addToQueue({
+            title: item.snippet.title,
+            id: item.snippet.resourceId.videoId,
+            url:
+              "https://www.youtube.com/watch?v=" +
+              item.snippet.resourceId.videoId,
+            thumbnail: thumbnail,
+            source: "youtube"
+          });
+        });
+      },
+      error => console.error(error)
+    );
   }
   // Misc
+
+  search(query: string): void {
+    if (query.trim().length == 0) {
+      this.clearResults();
+      return;
+    }
+    var albumPos = query.search(/album/i);
+    var playlistPos = query.search(/playlist/i);
+    var spotifyAuthorized = this.auth.spotifyAuth.value;
+    if (albumPos != -1) {
+      console.log("Searching for album...");
+      // remove album from search query
+      query = this.removeString(query, albumPos, "album".length);
+      if (query.trim().length == 0) return;
+      var youtubePos = query.search(/youtube/i);
+      if (youtubePos != -1 || !spotifyAuthorized) {
+        // search for youtube playlist
+        query =
+          youtubePos != -1
+            ? this.removeString(query, youtubePos, "youtube".length)
+            : query;
+        if (query.trim().length == 0) return;
+        this.searchYoutubePlaylist(query);
+        return;
+      }
+      // search for spotify album
+      this.searchSpotifyAlbum(query);
+    } else if (playlistPos != -1) {
+      console.log("Searching for playlist...");
+      // remove playlist from search query
+      query = this.removeString(query, playlistPos, "playlist".length);
+      if (query.trim().length == 0) return;
+      var youtubePos = query.search(/youtube/i);
+      if (youtubePos != -1 || !spotifyAuthorized) {
+        // search for youtube playlist
+        query =
+          youtubePos != -1
+            ? this.removeString(query, youtubePos, "youtube".length)
+            : query;
+        if (query.trim().length == 0) return;
+        this.searchYoutubePlaylist(query);
+        return;
+      }
+      // search for spotify album
+      this.searchSpotifyAlbum(query);
+    } else {
+      var youtubePos = query.search(/youtube/i);
+      if (youtubePos != -1 || !spotifyAuthorized) {
+        // search for video
+        query =
+          youtubePos != -1
+            ? this.removeString(query, youtubePos, "youtube".length)
+            : query;
+        if (query.trim().length == 0) return;
+        this.searchYoutube(query);
+        return;
+      }
+      this.searchSpotify(query);
+    }
+  }
+
+  removeString(a: string, index: number, length: number): string {
+    var array = [...a];
+    array.splice(index, length);
+    return array.join("");
+  }
+
   clearResults(): void {
     this.results.next([]);
   }

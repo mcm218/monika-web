@@ -43,7 +43,6 @@ export class AuthService {
       } else {
         this.authorizeSpotify(url, code);
       }
-      this.authorizeDiscord();
     } else {
       //authorize discord
       this.authorizeDiscord(url, code);
@@ -177,7 +176,13 @@ export class AuthService {
             this.getUser();
           }
         },
-        error => console.error(error)
+        error => {
+          console.error(error);
+          if (error.code == 401 || error.code == 403) {
+            this.authenticated.next(false);
+            this.cookieService.deleteAll();
+          }
+        }
       );
   }
 
@@ -261,6 +266,9 @@ export class AuthService {
           this.router.navigate(["/"]);
         },
         error => {
+          if (!this.cookieService.check("youtube-token")) {
+            this.authorizeYoutube(url, code);
+          }
           console.log(error);
         }
       );
@@ -285,6 +293,7 @@ export class AuthService {
       .pipe()
       .subscribe(
         response => {
+          console.log(response);
           this.spotifyAccessToken = response["access_token"];
           this.spotifyAuth.next(true);
           this.cookieService.set(
@@ -293,10 +302,6 @@ export class AuthService {
             new Date(
               new Date().getTime() + Number(response["expires_in"] * 1000)
             )
-          );
-          this.cookieService.set(
-            "spotify-refresh-token",
-            response["refresh_token"]
           );
         },
         error => {
@@ -334,7 +339,6 @@ export class AuthService {
       .pipe()
       .subscribe(
         response => {
-          console.log(response);
           this.youtubeAccessToken = response["access_token"];
           this.youtubeAuth.next(true);
           this.cookieService.set(
@@ -344,13 +348,10 @@ export class AuthService {
               new Date().getTime() + Number(response["expires_in"] * 1000)
             )
           );
-          this.cookieService.set(
-            "youtube-refresh-token",
-            response["refresh_token"]
-          );
           this.router.navigate(["/"]);
         },
         error => {
+          this.cookieService.delete("youtube-refresh-token");
           console.log(error);
         }
       );

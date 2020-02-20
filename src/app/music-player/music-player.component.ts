@@ -7,22 +7,55 @@ import {
   faRedo,
   faPause
 } from "@fortawesome/free-solid-svg-icons";
-import { Song } from "../db.service";
+import { Song, MusicController, DbService } from "../db.service";
 @Component({
   selector: "app-music-player",
   templateUrl: "./music-player.component.html",
   styleUrls: ["./music-player.component.css"]
 })
 export class MusicPlayerComponent implements OnInit {
+  @Input() controller: MusicController;
   @Input() song: Song;
+
   faPlay = faPlay;
   faForward = faForward;
   faRandom = faRandom;
   faBackward = faBackward;
   faRedo = faRedo;
   faPause = faPause;
-
-  constructor() {}
+  constructor(private db: DbService) {}
 
   ngOnInit() {}
+
+  // Reorder queue, update
+  shuffle(): void {
+    this.db.shuffle();
+  }
+
+  // Reset stream to beginning of song
+  prevSong(): void {}
+
+  // If playing, pause; else play
+  togglePlay(): void {
+    this.controller.pauseState = !this.controller.pauseState;
+    this.db.updateController(this.controller);
+  }
+
+  //
+  nextSong(): void {
+    this.db.skipCurrent();
+  }
+
+  toggleLoop(): void {
+    this.controller.loop++;
+    if (this.controller.loop > 2) {
+      this.controller.loop = 0;
+    }
+    this.db.updateController(this.controller);
+  }
+
+  changeVolume(event: any): void {
+    this.controller.volume = event.target.value;
+    this.db.updateController(this.controller);
+  }
 }

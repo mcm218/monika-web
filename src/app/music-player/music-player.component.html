@@ -1,18 +1,48 @@
 <div *ngIf="song" class="card">
-  <img [src]="song.thumbnail" class="card-img-top" />
-  <div id="block"></div>
-  <div id="title">{{ song.title }}</div>
-  <div id="artist">{{ song.artist }}</div>
-
-  <!-- <div class="card-body">
-    <div class="row">
-      <div class="col mx-auto"></div>
-      <button><fa-icon [icon]="faRandom" size="lg"></fa-icon></button>
-      <button><fa-icon [icon]="faBackward" size="lg"></fa-icon></button>
-      <button><fa-icon [icon]="faPlay" size="lg"></fa-icon></button>
-      <button><fa-icon [icon]="faForward" size="lg"></fa-icon></button>
-      <button><fa-icon [icon]="faRedo" size="lg"></fa-icon></button>
-      <div class="col mx-auto"></div>
+  <div class="cover">
+    <img [src]="song.thumbnail" class="card-img-top" />
+    <div id="block"></div>
+    <div id="title">{{ song.title }}</div>
+    <div id="artist">{{ song.artist }}</div>
+    <div id="controls" class="justify-content-center d-md-none">
+      <!-- Shuffle -->
+      <button class="col-2W" (click)="shuffle()">
+        <fa-icon [icon]="faRandom" size="2x"></fa-icon>
+      </button>
+      <!-- Previous -->
+      <button class="col-2" (click)="prevSong()">
+        <fa-icon [icon]="faBackward" size="2x"></fa-icon>
+      </button>
+      <!-- Pause/Play -->
+      <button class="col-2" (click)="togglePlay()">
+        <div *ngIf="controller.pauseState; else elseBlock">
+          <fa-icon [icon]="faPause" size="2x"></fa-icon>
+        </div>
+        <ng-template #elseBlock>
+          <fa-icon [icon]="faPlay" size="2x"></fa-icon>
+        </ng-template>
+      </button>
+      <!-- Skip -->
+      <button class="col-2" (click)="nextSong()">
+        <fa-icon [icon]="faForward" size="2x"></fa-icon>
+      </button>
+      <!-- Loop -->
+      <button class="col-2" (click)="toggleLoop()">
+        <ng-container *ngIf="controller.loop == 0; else loopElseIfBlock">
+          <fa-icon [icon]="faRedo" size="2x"></fa-icon>
+        </ng-container>
+        <ng-template #loopElseIfBlock
+          ><ng-container *ngIf="controller.loop == 1; else loopElseBlock">
+            <fa-icon
+              [icon]="faRedo"
+              size="2x"
+              class="active"
+            ></fa-icon> </ng-container
+        ></ng-template>
+        <ng-template #loopElseBlock>
+          <fa-icon [icon]="faRedo" size="2x" class="active"></fa-icon>
+        </ng-template>
+      </button>
     </div>
-  </div> -->
+  </div>
 </div>

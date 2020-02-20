@@ -1,5 +1,5 @@
-<div class="container-fluid">
-  <nav class="gradient navbar fixed-top navbar-expand-lg">
+<div id="app" class="container-fluid">
+  <nav id="navbar" class="gradient navbar fixed-top navbar-expand-lg">
     <div class="gradient collapse navbar-collapse" id="navbarSupportedContent">
       <button *ngIf="authenticated" (click)="openSettings()">
         <fa-icon [icon]="settings ? faHome : faCog"></fa-icon>
@@ -64,11 +64,11 @@
       (keyup.enter)="search()"
     />
   </nav>
-  <div class="row" style="height: 100%;">
-    <div class="col-md-3 col-6 order-md-1 panel">
+  <div id="home" class="row" style="height: 100%;">
+    <div id="playlists" class="col-md-3 col-6 order-md-1 panel">
       <app-lists [playlists]="playlists"></app-lists>
     </div>
-    <div class="col-md col-sm-12 order-md-2 order-first">
+    <div id="center" class="col-md col-sm-12 order-md-2 order-first">
       <!-- Not Authenticated -->
       <div *ngIf="!authenticated; else settingsTab">
         <app-login></app-login>
@@ -90,17 +90,20 @@
             </div>
             <!-- Music Player Tab -->
             <ng-template #musicPlayer>
-              <app-music-player [song]="currentSong"></app-music-player>
+              <app-music-player
+                [song]="currentSong"
+                [controller]="controller"
+              ></app-music-player>
             </ng-template>
           </ng-template>
         </ng-template>
       </ng-template>
     </div>
-    <div class="col-md-3 col-6 order-md-3 panel">
+    <div id="queue" class="col-md-3 col-6 order-md-3 panel">
       <app-queue [queue]="queue"></app-queue>
     </div>
   </div>
-  <nav class="navbar bottom-bar fixed-bottom navbar-dark bg">
+  <nav id="music-player" class="navbar bottom-bar fixed-bottom navbar-dark bg">
     <app-inline-music-player
       [song]="currentSong"
       [controller]="controller"

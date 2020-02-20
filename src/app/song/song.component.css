@@ -10,3 +10,10 @@ fa-icon {
   padding: 0;
   margin: 0;
 }
+.avatar {
+  padding: 0;
+  margin: 0;
+  max-height: 40px;
+  max-width: 40px;
+  border-radius: 50px;
+}

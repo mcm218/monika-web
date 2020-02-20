@@ -1,30 +1,58 @@
-.card {
-  background-color: #161616;
-  max-width: 400px;
+.cover {
   position: relative;
   text-align: center;
-  color: white;
 }
-
+img {
+  border-radius: 20px;
+}
+.card {
+  background-color: black;
+  min-height: 300px;
+  max-width: 400px;
+  color: white;
+  border-radius: 20px;
+}
+.active {
+  color: #e16035;
+}
 #title {
   position: absolute;
-  top: 80%;
+  top: 73%;
   left: 0;
   width: 100%;
   text-align: center;
 }
 #artist {
   position: absolute;
-  top: 90%;
+  top: 80%;
   left: 0;
   width: 100%;
   text-align: center;
   color: #e16035;
 }
+#controls {
+  position: absolute;
+  top: 83%;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  padding: 10px 0;
+  text-align: center;
+}
 #block {
   position: absolute;
-  height: 25%;
-  top: 75%;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  height: 50%;
+  top: 50%;
+  padding: 0;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  max-width: 400px;
+  background: rgba(0, 0, 0, 0);
+  background: linear-gradient(
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0.33) 20%,
+    rgba(0, 0, 0, 0.66) 40%,
+    rgba(0, 0, 0, 0.9) 60%
+  );
 }

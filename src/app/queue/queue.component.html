@@ -1,5 +1,10 @@
-<div class="list-group" *ngIf="queue">
-  <div class="song list-group-item" *ngFor="let song of queue">
+<div
+  cdkDropList
+  (cdkDropListDropped)="drop($event)"
+  class="list-group"
+  *ngIf="queue"
+>
+  <div class="song list-group-item" *ngFor="let song of queue" cdkDrag>
     <app-song [song]="song"></app-song>
   </div>
 </div>

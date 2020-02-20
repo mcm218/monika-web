@@ -1,44 +1,55 @@
 <div class="row">
-  <div class="col-1" *ngIf="song">
+  <div class="col-2 col-md-1" *ngIf="song">
     <img class="thumbnail" [src]="song.thumbnail" />
   </div>
-  <div class="col-3 my-auto" *ngIf="song">
+  <div class="col-8 col-sm-4 col-md-3 my-auto" *ngIf="song">
     <p>{{ song.title }}</p>
     <p class="artist">{{ song.artist }}</p>
   </div>
-  <div class="col-4 my-auto controls" *ngIf="song">
-    <!-- Shuffle -->
-    <button (click)="shuffle()"><fa-icon [icon]="faRandom"></fa-icon></button>
-    <!-- Previous -->
-    <button (click)="prevSong()">
-      <fa-icon [icon]="faBackward"></fa-icon>
-    </button>
-    <!-- Pause/Play -->
-    <button (click)="togglePlay()">
-      <div *ngIf="controller.pauseState; else elseBlock">
-        <fa-icon [icon]="faPause" size="lg"></fa-icon>
-      </div>
-      <ng-template #elseBlock>
-        <fa-icon [icon]="faPlay" size="lg"></fa-icon>
-      </ng-template>
-    </button>
-    <!-- Skip -->
-    <button (click)="nextSong()"><fa-icon [icon]="faForward"></fa-icon></button>
-    <!-- Loop -->
-    <button (click)="toggleLoop()">
-      <ng-container *ngIf="controller.loop == 0; else loopElseIfBlock">
-        <fa-icon [icon]="faRedo"></fa-icon>
-      </ng-container>
-      <ng-template #loopElseIfBlock
-        ><ng-container *ngIf="controller.loop == 1; else loopElseBlock">
-          <fa-icon [icon]="faRedo" class="active"></fa-icon> </ng-container
-      ></ng-template>
-      <ng-template #loopElseBlock>
-        <fa-icon [icon]="faRedo" class="active"></fa-icon>
-      </ng-template>
-    </button>
+  <div class="col-2 col-sm-3 col-md-4 my-auto controls" *ngIf="song">
+    <div class="row justify-content-md-center">
+      <!-- Shuffle -->
+      <button class="col-1 d-none d-md-block" (click)="shuffle()">
+        <fa-icon [icon]="faRandom"></fa-icon>
+      </button>
+      <!-- Previous -->
+      <button class="col-1 d-none d-md-block" (click)="prevSong()">
+        <fa-icon [icon]="faBackward"></fa-icon>
+      </button>
+      <!-- Pause/Play -->
+      <button class="col-1" (click)="togglePlay()">
+        <div *ngIf="controller.pauseState; else elseBlock">
+          <fa-icon [icon]="faPause" size="lg"></fa-icon>
+        </div>
+        <ng-template #elseBlock>
+          <fa-icon [icon]="faPlay" size="lg"></fa-icon>
+        </ng-template>
+      </button>
+      <!-- Skip -->
+      <button class="col-1 d-none d-md-block" (click)="nextSong()">
+        <fa-icon [icon]="faForward"></fa-icon>
+      </button>
+      <!-- Loop -->
+      <button class="col-1 d-none d-md-block" (click)="toggleLoop()">
+        <ng-container *ngIf="controller.loop == 0; else loopElseIfBlock">
+          <fa-icon [icon]="faRedo"></fa-icon>
+        </ng-container>
+        <ng-template #loopElseIfBlock
+          ><ng-container *ngIf="controller.loop == 1; else loopElseBlock">
+            <fa-icon [icon]="faRedo" class="active"></fa-icon> </ng-container
+        ></ng-template>
+        <ng-template #loopElseBlock>
+          <fa-icon [icon]="faRedo" class="active"></fa-icon>
+        </ng-template>
+      </button>
+    </div>
   </div>
-  <div id="slidercontainer" class="col-4 my-auto" *ngIf="song">
+  <div
+    id="slidercontainer"
+    class="col-4 d-none d-md-block
+  my-auto"
+    *ngIf="song"
+  >
     <input
       type="range"
       min="0"

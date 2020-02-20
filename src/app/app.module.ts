@@ -2,6 +2,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
+import { DragDropModule } from "@angular/cdk/drag-drop";
 
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { AngularFireModule } from "@angular/fire";
@@ -45,7 +46,8 @@ import { ResultsListComponent } from "./results-list/results-list.component";
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    DragDropModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]

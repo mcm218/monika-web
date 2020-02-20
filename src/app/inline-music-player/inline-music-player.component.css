@@ -17,7 +17,11 @@
 p {
   margin: 0;
   margin-top: 5px;
+  margin-left: 5px;
   color: white;
+}
+.thumbnail{
+  margin-left: 20px;
 }
 .artist {
   color: #e16035;

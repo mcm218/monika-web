@@ -69,7 +69,6 @@ export class HomeComponent implements OnInit {
       const accessToken = params["access_token"];
       const url = window.location.href.split("?")[0];
       if (code) {
-        //authorize discord spotify or discord
         this.auth.authorize(url, code);
       } else {
         this.auth.authorizeDiscord();
@@ -88,6 +87,6 @@ export class HomeComponent implements OnInit {
   }
 
   search(): void {
-    this.db.searchSpotify(this.query.value);
+    this.db.search(this.query.value);
   }
 }
