@@ -6,6 +6,7 @@ import {
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-list",
@@ -20,7 +21,7 @@ export class ListComponent implements OnInit {
   faTimes = faTimes;
   faSolidHeart = faSolidHeart;
 
-  constructor(private db: DbService) {}
+  constructor(private db: DbService, private snackBar: MatSnackBar) {}
 
   ngOnInit() {}
 
@@ -36,6 +37,14 @@ export class ListComponent implements OnInit {
   }
 
   addToQueue(song: Song) {
+    this.openSnackBar(song);
     this.db.addToQueue(song);
+  }
+
+  openSnackBar(song: Song) {
+    console.log("Opening snackbar?");
+    this.snackBar.open(song.title + " added to queue!", "", {
+      duration: 2000
+    });
   }
 }

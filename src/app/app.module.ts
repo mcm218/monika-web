@@ -10,6 +10,8 @@ import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { CookieService } from "ngx-cookie-service";
 
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./home/home.component";
@@ -23,6 +25,7 @@ import { InlineMusicPlayerComponent } from "./inline-music-player/inline-music-p
 import { SettingsComponent } from "./settings/settings.component";
 import { environment } from "src/environments/environment";
 import { ResultsListComponent } from "./results-list/results-list.component";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -47,7 +50,9 @@ import { ResultsListComponent } from "./results-list/results-list.component";
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
-    DragDropModule
+    DragDropModule,
+    MatSnackBarModule,
+    BrowserAnimationsModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]

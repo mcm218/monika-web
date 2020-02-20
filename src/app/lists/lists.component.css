@@ -8,10 +8,11 @@
 }
 .list-group {
   /* direction: rtl; */
-  height: calc(100vh - 120px);
+  height: calc(100vh - 150px);
   background-color: rgba(0, 0, 0, 0);
   overflow: hidden;
   overflow-y: scroll;
+  padding-top: 10px;
 }
 
 .list-group::-webkit-scrollbar {

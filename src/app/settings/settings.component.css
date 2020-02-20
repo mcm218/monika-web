@@ -17,6 +17,7 @@ a {
   background-color: #131313;
   color: white;
   font-size: small;
+  border-radius: 20px;
 }
 .row {
   padding: 0;

@@ -5,11 +5,12 @@
 .card {
   max-width: 800px;
   text-align: start;
-  margin: 16px auto;
-  padding: 5px;
+  margin: 20px auto;
+  padding: 10px 5px;
   background-color: #131313;
   color: white;
   font-size: small;
+  border-radius: 20px;
 }
 .row {
   padding: 0px 10px;
@@ -31,12 +32,11 @@ hr {
   color: #e16035;
 }
 
-.list-group {
-  /* direction: rtl; */
+/* .list-group {
   height: calc(100vh - 200px);
   overflow: hidden;
   overflow-y: scroll;
-}
+} */
 
 .list-group::-webkit-scrollbar {
   width: 1em;

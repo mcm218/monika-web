@@ -62,6 +62,7 @@ export class DbService {
   spotifyAlbumPath = "https://api.spotify.com/v1/albums/";
   selectedList = new BehaviorSubject<Playlist>(undefined);
   queue = new BehaviorSubject<Song[]>([]);
+  history = new BehaviorSubject<Song[]>([]);
   currentSong = new BehaviorSubject<Song>(undefined);
   playlists = new BehaviorSubject<Playlist[]>([]);
   controller = new BehaviorSubject<MusicController>(undefined);
@@ -101,9 +102,38 @@ export class DbService {
       .snapshotChanges()
       .subscribe(snapshot => {
         var data = snapshot.payload.data() as { queue: [] };
+        //check if need to update history
+        const prev = this.currentSong.value;
+        //update history when song finishes
+        if (
+          prev &&
+          data.queue &&
+          data.queue.length > 0 &&
+          prev.id != (data.queue as Song[])[0].id
+        ) {
+          const history = this.history.value;
+          // don't add to history if user hit previous button
+          if (history[0].id != prev.id) {
+            history.unshift(prev[0]);
+            if (history.length > 20) {
+              history.pop();
+            }
+            ref.doc("history").set({ history: history });
+          }
+        }
         var currentSong = data.queue.splice(0, 1)[0];
         this.currentSong.next(currentSong);
         this.queue.next(data.queue);
+      });
+    // History
+    ref
+      .doc("history")
+      .snapshotChanges()
+      .subscribe(snapshot => {
+        var data = snapshot.payload.data() as { history: [] };
+        if (snapshot.payload.exists) {
+          this.history.next(data.history);
+        }
       });
   }
 
@@ -142,12 +172,35 @@ export class DbService {
   }
   skipCurrent() {
     const queue = this.queue.value;
+    const history = Object.assign([], this.history.value);
+    history.unshift(this.currentSong.value);
+    if (history.length > 20) {
+      history.pop();
+    }
+    this.updateHistory(history);
     this.queue.next(Object.assign([], queue));
     const path = "guilds/" + this.auth.selectedServer.value.id + "/VC";
     this.firestore
       .collection(path)
       .doc("queue")
       .set({ queue: queue });
+  }
+
+  updateHistory(history: Song[]) {
+    const path = "guilds/" + this.auth.selectedServer.value.id + "/VC";
+    const ref = this.firestore.collection(path);
+    ref.doc("history").set({ history: history });
+  }
+
+  previousSong() {
+    const history = this.history.value;
+    const currentSong = this.currentSong.value;
+    const queue = this.queue.value;
+    queue.unshift(currentSong);
+    this.currentSong.next(history[0]);
+    history.shift();
+    this.updateHistory(history);
+    this.updateQueue(queue);
   }
 
   shuffle() {
@@ -253,6 +306,7 @@ export class DbService {
     }
     ref.set(results);
   }
+
   // Spotify
   getSpotifyLists(): void {
     var headers = new HttpHeaders({

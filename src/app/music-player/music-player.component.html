@@ -2,8 +2,10 @@
   <div class="cover">
     <img [src]="song.thumbnail" class="card-img-top" />
     <div id="block"></div>
-    <div id="title">{{ song.title }}</div>
-    <div id="artist">{{ song.artist }}</div>
+    <div id="title" class="d-block d-md-none">{{ song.title }}</div>
+    <div id="artist" class="d-block d-md-none">{{ song.artist }}</div>
+    <div id="titleLarge" class="d-none d-md-block">{{ song.title }}</div>
+    <div id="artistLarge" class="d-none d-md-block">{{ song.artist }}</div>
     <div id="controls" class="justify-content-center d-md-none">
       <!-- Shuffle -->
       <button class="col-2W" (click)="shuffle()">

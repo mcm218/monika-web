@@ -9,15 +9,15 @@
   <div class="col-2 col-sm-3 col-md-4 my-auto controls" *ngIf="song">
     <div class="row justify-content-md-center">
       <!-- Shuffle -->
-      <button class="col-1 d-none d-md-block" (click)="shuffle()">
+      <button class="col d-none d-md-block" (click)="shuffle()">
         <fa-icon [icon]="faRandom"></fa-icon>
       </button>
       <!-- Previous -->
-      <button class="col-1 d-none d-md-block" (click)="prevSong()">
+      <button class="col d-none d-md-block" (click)="prevSong()">
         <fa-icon [icon]="faBackward"></fa-icon>
       </button>
       <!-- Pause/Play -->
-      <button class="col-1" (click)="togglePlay()">
+      <button class="col" (click)="togglePlay()">
         <div *ngIf="controller.pauseState; else elseBlock">
           <fa-icon [icon]="faPause" size="lg"></fa-icon>
         </div>
@@ -26,11 +26,11 @@
         </ng-template>
       </button>
       <!-- Skip -->
-      <button class="col-1 d-none d-md-block" (click)="nextSong()">
+      <button class="col d-none d-md-block" (click)="nextSong()">
         <fa-icon [icon]="faForward"></fa-icon>
       </button>
       <!-- Loop -->
-      <button class="col-1 d-none d-md-block" (click)="toggleLoop()">
+      <button class="col d-none d-md-block" (click)="toggleLoop()">
         <ng-container *ngIf="controller.loop == 0; else loopElseIfBlock">
           <fa-icon [icon]="faRedo"></fa-icon>
         </ng-container>

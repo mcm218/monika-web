@@ -34,7 +34,9 @@ export class InlineMusicPlayerComponent implements OnInit {
   }
 
   // Reset stream to beginning of song
-  prevSong(): void {}
+  prevSong(): void {
+    this.db.previousSong();
+  }
 
   // If playing, pause; else play
   togglePlay(): void {

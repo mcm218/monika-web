@@ -1,49 +1,49 @@
 <div id="app" class="container-fluid">
   <nav id="navbar" class="gradient navbar fixed-top navbar-expand-lg">
-    <div class="gradient collapse navbar-collapse" id="navbarSupportedContent">
-      <button *ngIf="authenticated" (click)="openSettings()">
-        <fa-icon [icon]="settings ? faHome : faCog"></fa-icon>
+    <!-- <div class="gradient collapse navbar-collapse" id="navbarSupportedContent"> -->
+    <button *ngIf="authenticated" (click)="openSettings()">
+      <fa-icon [icon]="settings ? faHome : faCog"></fa-icon>
+    </button>
+    <div *ngIf="selectedServer" class="dropdown nav-item">
+      <button
+        class="btn dropdown-toggle nav-item"
+        type="button"
+        id="serverMenuButton"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        {{ selectedServer.name }}
       </button>
-      <div *ngIf="selectedServer" class="dropdown nav-item">
-        <button
-          class="btn dropdown-toggle nav-item"
-          type="button"
-          id="serverMenuButton"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
+      <div class="dropdown-menu" aria-labelledby="serverMenuButton">
+        <a
+          *ngFor="let server of servers"
+          (click)="selectServer(server)"
+          class="dropdown-item"
+          >{{ server.name }}</a
         >
-          {{ selectedServer.name }}
-        </button>
-        <div class="dropdown-menu" aria-labelledby="serverMenuButton">
-          <a
-            *ngFor="let server of servers"
-            (click)="selectServer(server)"
-            class="dropdown-item"
-            >{{ server.name }}</a
-          >
-        </div>
       </div>
-      <a *ngIf="selectedServer" class="navbar-brand nav-item">
-        <img
-          class="avatar"
-          [src]="
-            'https://cdn.discordapp.com/icons/' +
-            selectedServer.id +
-            '/' +
-            selectedServer.icon
-          "
-        />
-      </a>
-      <a *ngIf="user" class="navbar-brand nav-item">
-        <img
-          class="avatar"
-          [src]="
-            'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar
-          "
-        />
-      </a>
     </div>
+    <a *ngIf="selectedServer" class="navbar-brand nav-item">
+      <img
+        class="avatar"
+        [src]="
+          'https://cdn.discordapp.com/icons/' +
+          selectedServer.id +
+          '/' +
+          selectedServer.icon
+        "
+      />
+    </a>
+    <a *ngIf="user" class="navbar-brand nav-item">
+      <img
+        class="avatar"
+        [src]="
+          'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar
+        "
+      />
+    </a>
+    <!-- </div>
     <button
       class="navbar-toggler"
       type="button"
@@ -54,9 +54,9 @@
       aria-label="Toggle navigation"
     >
       <span class="navbar-toggler-icon"></span>
-    </button>
+    </button> -->
     <input
-      class="form-control mr-sm-2"
+      class="form-control ml-auto mr-sm-2 d-none d-sm-block"
       type="search"
       placeHolder="Search"
       aria-label="Search"
@@ -65,7 +65,10 @@
     />
   </nav>
   <div id="home" class="row" style="height: 100%;">
-    <div id="playlists" class="col-md-3 col-6 order-md-1 panel">
+    <div
+      id="playlists"
+      class="col-sm-6 col-md-3 order-md-1 panel d-none d-sm-block"
+    >
       <app-lists [playlists]="playlists"></app-lists>
     </div>
     <div id="center" class="col-md col-sm-12 order-md-2 order-first">
@@ -99,7 +102,7 @@
         </ng-template>
       </ng-template>
     </div>
-    <div id="queue" class="col-md-3 col-6 order-md-3 panel">
+    <div id="queue" class="col-sm-6 col-md-3 mx-auto order-md-3 panel">
       <app-queue [queue]="queue"></app-queue>
     </div>
   </div>

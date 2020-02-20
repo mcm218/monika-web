@@ -1,6 +1,6 @@
 <div class="card bg" *ngIf="playlist">
   <div class="row">
-    <div class="col-11">
+    <div class="col-10">
       <h2>
         {{ playlist.title }}
       </h2>
@@ -15,7 +15,7 @@
         <button class="col-1 my-auto" (click)="addToQueue(song)">
           <fa-icon [icon]="faPlus"></fa-icon>
         </button>
-        <span class="col-6 my-auto">{{ song.title }}</span>
+        <span class="col-5 my-auto">{{ song.title }}</span>
         <span class="col-4 my-auto">{{ song.artist }}</span>
         <button class="col-1 my-auto" (click)="toggleFavorite(song)">
           <div *ngIf="isFavorite(song.id); else elseBlock">
