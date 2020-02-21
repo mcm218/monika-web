@@ -1,15 +1,26 @@
-.row {
+#home {
   text-align: center;
   padding: 0;
   margin: 0;
   margin-top: 50px;
+}
+#online-users {
+  margin-top: 0;
+  width: flex;
+}
+#online-user{
+  margin: 0 5px;
+}
+#online-user-controls{
+  margin: 0;
+  margin-left: 10px;
 }
 .container-fluid {
   background-color: rgb(22, 22, 22, 0);
   margin: 0;
   padding: 0;
 }
-#center{
+#center {
   margin-top: 20px;
 }
 .col-sm-4 {
@@ -54,6 +65,9 @@ input:focus {
 }
 input:focus {
   background-color: #131313;
+}
+.active {
+  color: #e16035;
 }
 .dropdown-menu {
   padding: 0;

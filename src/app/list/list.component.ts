@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, NgZone } from "@angular/core";
 import { Playlist, DbService, Song } from "../db.service";
 import {
   faHeart as faSolidHeart,
@@ -6,7 +6,7 @@ import {
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: "app-list",
@@ -21,7 +21,7 @@ export class ListComponent implements OnInit {
   faTimes = faTimes;
   faSolidHeart = faSolidHeart;
 
-  constructor(private db: DbService, private snackBar: MatSnackBar) {}
+  constructor(private db: DbService, private toastr: ToastrService) {}
 
   ngOnInit() {}
 
@@ -37,14 +37,7 @@ export class ListComponent implements OnInit {
   }
 
   addToQueue(song: Song) {
-    this.openSnackBar(song);
+    this.toastr.show(song.title + " was added to the queue!", "");
     this.db.addToQueue(song);
-  }
-
-  openSnackBar(song: Song) {
-    console.log("Opening snackbar?");
-    this.snackBar.open(song.title + " added to queue!", "", {
-      duration: 2000
-    });
   }
 }

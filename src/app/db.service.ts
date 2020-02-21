@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subscription } from "rxjs";
 import { environment } from "src/environments/environment";
 import { AuthService } from "./auth.service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
@@ -66,6 +66,7 @@ export class DbService {
   currentSong = new BehaviorSubject<Song>(undefined);
   playlists = new BehaviorSubject<Playlist[]>([]);
   controller = new BehaviorSubject<MusicController>(undefined);
+  onlineUsers = new BehaviorSubject<any[]>([]);
 
   userHistory = new BehaviorSubject<Song[]>([]);
   userMostAdded = new BehaviorSubject<Song[]>([]);
@@ -76,6 +77,12 @@ export class DbService {
 
   results = new BehaviorSubject<any[]>([]);
   settings = new BehaviorSubject<boolean>(false);
+
+  // Subscriptions
+  controlSub: Subscription;
+  queueSub: Subscription;
+  historySub: Subscription;
+  usersSub: Subscription;
 
   constructor(
     private firestore: AngularFirestore,
@@ -88,7 +95,13 @@ export class DbService {
     // Controller
     const path = "guilds/" + this.auth.selectedServer.value.id + "/VC";
     const ref = this.firestore.collection(path);
-    ref
+    if (this.controlSub || this.queueSub || this.historySub || this.usersSub) {
+      this.controlSub.unsubscribe();
+      this.queueSub.unsubscribe();
+      this.historySub.unsubscribe();
+      this.usersSub.unsubscribe();
+    }
+    this.controlSub = ref
       .doc("controller")
       .snapshotChanges()
       .subscribe(snapshot => {
@@ -97,7 +110,7 @@ export class DbService {
       });
 
     // Queue
-    ref
+    this.queueSub = ref
       .doc("queue")
       .snapshotChanges()
       .subscribe(snapshot => {
@@ -114,7 +127,7 @@ export class DbService {
           const history = this.history.value;
           // don't add to history if user hit previous button
           if (history[0].id != prev.id) {
-            history.unshift(prev[0]);
+            history.unshift(prev);
             if (history.length > 20) {
               history.pop();
             }
@@ -126,7 +139,7 @@ export class DbService {
         this.queue.next(data.queue);
       });
     // History
-    ref
+    this.historySub = ref
       .doc("history")
       .snapshotChanges()
       .subscribe(snapshot => {
@@ -135,6 +148,18 @@ export class DbService {
           this.history.next(data.history);
         }
       });
+    // Online Users
+    this.usersSub = ref.snapshotChanges().subscribe(snapshots => {
+      const onlineUsers = [];
+      snapshots.forEach(snapshot => {
+        const user = snapshot.payload.doc.data() as any;
+        if (user.id && user.username) {
+          // Valid User, add to list
+          onlineUsers.push(user);
+        }
+      });
+      this.onlineUsers.next(onlineUsers);
+    });
   }
 
   updateController(controller: MusicController) {
@@ -172,7 +197,10 @@ export class DbService {
   }
   skipCurrent() {
     const queue = this.queue.value;
-    const history = Object.assign([], this.history.value);
+    var history = Object.assign([], this.history.value);
+    if (!history) {
+      history = [];
+    }
     history.unshift(this.currentSong.value);
     if (history.length > 20) {
       history.pop();
@@ -194,6 +222,9 @@ export class DbService {
 
   previousSong() {
     const history = this.history.value;
+    if (!history || history.length == 0) {
+      return;
+    }
     const currentSong = this.currentSong.value;
     const queue = this.queue.value;
     queue.unshift(currentSong);
@@ -217,7 +248,9 @@ export class DbService {
   updateQueue(queue: Song[]) {
     this.queue.next(Object.assign([], queue));
     const currentSong = this.currentSong.value;
-    queue.unshift(currentSong);
+    if (currentSong) {
+      queue.unshift(currentSong);
+    }
     const path = "guilds/" + this.auth.selectedServer.value.id + "/VC";
     this.firestore
       .collection(path)

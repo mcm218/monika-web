@@ -9,8 +9,7 @@ import { AngularFireModule } from "@angular/fire";
 import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { CookieService } from "ngx-cookie-service";
-
-import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { ToastrModule } from "ngx-toastr";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -25,7 +24,7 @@ import { InlineMusicPlayerComponent } from "./inline-music-player/inline-music-p
 import { SettingsComponent } from "./settings/settings.component";
 import { environment } from "src/environments/environment";
 import { ResultsListComponent } from "./results-list/results-list.component";
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [
@@ -51,8 +50,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AngularFirestoreModule,
     AngularFireAuthModule,
     DragDropModule,
-    MatSnackBarModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      timeOut: 2000,
+      positionClass: "toast-top-center"
+    })
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]

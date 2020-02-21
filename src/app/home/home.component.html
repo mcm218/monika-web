@@ -1,10 +1,10 @@
 <div id="app" class="container-fluid">
   <nav id="navbar" class="gradient navbar fixed-top navbar-expand-lg">
     <!-- <div class="gradient collapse navbar-collapse" id="navbarSupportedContent"> -->
-    <button *ngIf="authenticated" (click)="openSettings()">
+    <button id="settings-button" *ngIf="authenticated" (click)="openSettings()">
       <fa-icon [icon]="settings ? faHome : faCog"></fa-icon>
     </button>
-    <div *ngIf="selectedServer" class="dropdown nav-item">
+    <div id="server-select" *ngIf="selectedServer" class="dropdown nav-item">
       <button
         class="btn dropdown-toggle nav-item"
         type="button"
@@ -24,7 +24,7 @@
         >
       </div>
     </div>
-    <a *ngIf="selectedServer" class="navbar-brand nav-item">
+    <a id="server-icon" *ngIf="selectedServer" class="navbar-brand nav-item">
       <img
         class="avatar"
         [src]="
@@ -35,14 +35,41 @@
         "
       />
     </a>
-    <a *ngIf="user" class="navbar-brand nav-item">
+    <!-- <a id="user-avatar" *ngIf="user" class="navbar-brand nav-item">
       <img
         class="avatar"
         [src]="
           'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar
         "
       />
-    </a>
+    </a> -->
+    <div id="online-users" class="row justify-content-around d-none d-md-block">
+      <div class="col" *ngFor="let user of onlineUsers; let i = index">
+        <div id="online-user" class="row" *ngIf="i < 8">
+          <img
+            class="avatar"
+            [src]="
+              'https://cdn.discordapp.com/avatars/' +
+              user.id +
+              '/' +
+              user.avatar
+            "
+          />
+          <div id="online-user-controls" class="col">
+            <fa-icon
+              class="active row px-auto"
+              *ngIf="user.muted"
+              [icon]="faMicrophoneSlash"
+            ></fa-icon>
+            <fa-icon
+              class="active row px-auto"
+              *ngIf="user.deaf"
+              [icon]="faPhoneSlash"
+            ></fa-icon>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- </div>
     <button
       class="navbar-toggler"
@@ -56,6 +83,7 @@
       <span class="navbar-toggler-icon"></span>
     </button> -->
     <input
+      id="search-bar"
       class="form-control ml-auto mr-sm-2 d-none d-sm-block"
       type="search"
       placeHolder="Search"

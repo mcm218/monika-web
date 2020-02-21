@@ -1,7 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { AuthService } from "../auth.service";
 import { DbService, Playlist, Song, MusicController } from "../db.service";
-import { faCog, faHome } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCog,
+  faHome,
+  faVolumeMute,
+  faPhoneSlash
+} from "@fortawesome/free-solid-svg-icons";
 import { ActivatedRoute } from "@angular/router";
 import { FormControl } from "@angular/forms";
 
@@ -20,6 +25,7 @@ export class HomeComponent implements OnInit {
   currentSong: Song;
   controller: MusicController;
   user: any;
+  onlineUsers: any[];
 
   query = new FormControl("");
 
@@ -28,6 +34,8 @@ export class HomeComponent implements OnInit {
 
   faCog = faCog;
   faHome = faHome;
+  faMicrophoneSlash = faVolumeMute;
+  faPhoneSlash = faPhoneSlash;
 
   constructor(
     private auth: AuthService,
@@ -43,6 +51,7 @@ export class HomeComponent implements OnInit {
           this.db.getMusicPlayerData();
         });
         this.db.queue.subscribe(queue => (this.queue = queue));
+        this.db.onlineUsers.subscribe(users => (this.onlineUsers = users));
         this.db.controller.subscribe(
           controller => (this.controller = controller)
         );

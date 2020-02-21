@@ -1,7 +1,7 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { DbService, Song } from "../db.service";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: "app-results-list",
@@ -11,24 +11,18 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 export class ResultsListComponent implements OnInit {
   faTimes = faTimes;
   results: any[];
-  constructor(private db: DbService, private _snackBar: MatSnackBar) {
+  constructor(private db: DbService, private toastr: ToastrService) {
     this.db.results.subscribe(results => (this.results = results));
   }
 
   ngOnInit() {}
 
-  addToQueue(result: any) {
-    this.openSnackBar(result);
+  addToQueue(result: Song) {
+    this.toastr.show(result.title + " was added to the queue!", "");
     this.db.addToQueue(result);
   }
 
   back() {
     this.db.clearResults();
-  }
-
-  openSnackBar(song: Song) {
-    this._snackBar.open(song.title + " added to queue!", "", {
-      duration: 2000
-    });
   }
 }

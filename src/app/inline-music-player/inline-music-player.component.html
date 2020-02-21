@@ -18,7 +18,7 @@
       </button>
       <!-- Pause/Play -->
       <button class="col" (click)="togglePlay()">
-        <div *ngIf="controller.pauseState; else elseBlock">
+        <div *ngIf="!controller.pauseState; else elseBlock">
           <fa-icon [icon]="faPause" size="lg"></fa-icon>
         </div>
         <ng-template #elseBlock>
