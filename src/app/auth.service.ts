@@ -348,6 +348,10 @@ export class AuthService {
               new Date().getTime() + Number(response["expires_in"] * 1000)
             )
           );
+          this.cookieService.set(
+            "youtube-refresh-token",
+            response["refresh_token"]
+          );
           this.router.navigate(["/"]);
         },
         error => {
@@ -384,10 +388,6 @@ export class AuthService {
             new Date(
               new Date().getTime() + Number(response["expires_in"] * 1000)
             )
-          );
-          this.cookieService.set(
-            "youtube-refresh-token",
-            response["refresh_token"]
           );
         },
         error => {
