@@ -21,6 +21,7 @@ export interface Song {
   user?: any;
   source?: string;
   artist?: string;
+  pos?: number;
 }
 export interface DbSong {
   dateAdded: Date;
@@ -112,17 +113,28 @@ export class DbService {
     // Queue
     this.queueSub = ref
       .doc("queue")
+      .collection("songs")
       .snapshotChanges()
-      .subscribe(snapshot => {
-        var data = snapshot.payload.data() as { queue: [] };
+      .subscribe(snapshots => {
+        // each song needs to be a field (unsorted)
+        // each song needs to contain its position
+        // sort after reading doc
+        const dbQueue = [];
+        snapshots.forEach(snapshot => {
+          const data = snapshot.payload.doc.data();
+          dbQueue.push(data);
+        });
+        dbQueue.sort((a, b) => a.pos - b.pos);
+
+        // var data = snapshot.payload.data() as { queue: [] };
         //check if need to update history
         const prev = this.currentSong.value;
         //update history when song finishes
         if (
           prev &&
-          data.queue &&
-          data.queue.length > 0 &&
-          prev.id != (data.queue as Song[])[0].id
+          dbQueue &&
+          dbQueue.length > 0 &&
+          prev.id != (dbQueue as Song[])[0].id
         ) {
           const history = this.history.value;
           // don't add to history if user hit previous button
@@ -134,9 +146,9 @@ export class DbService {
             ref.doc("history").set({ history: history });
           }
         }
-        var currentSong = data.queue.splice(0, 1)[0];
+        var currentSong = dbQueue.splice(0, 1)[0];
         this.currentSong.next(currentSong);
-        this.queue.next(data.queue);
+        this.queue.next(dbQueue);
       });
     // History
     this.historySub = ref
@@ -192,6 +204,12 @@ export class DbService {
   removeFromQueue(song: Song) {
     const queue = this.queue.value;
     const pos = queue.findIndex(a => a == song);
+    const path =
+      "guilds/" + this.auth.selectedServer.value.id + "/VC/queue/songs";
+    this.firestore
+      .collection(path)
+      .doc(queue.length.toString())
+      .delete();
     queue.splice(pos, 1);
     this.updateQueue(queue);
   }
@@ -207,11 +225,26 @@ export class DbService {
     }
     this.updateHistory(history);
     this.queue.next(Object.assign([], queue));
-    const path = "guilds/" + this.auth.selectedServer.value.id + "/VC";
+    const path =
+      "guilds/" + this.auth.selectedServer.value.id + "/VC/queue/songs";
+    //delete last song to prevent duplicates
+
     this.firestore
       .collection(path)
-      .doc("queue")
-      .set({ queue: queue });
+      .doc(queue.length.toString())
+      .delete();
+    var batch = this.firestore.firestore.batch();
+    let i = 0;
+    // upload new queue
+    queue.forEach(song => {
+      song.pos = i;
+      this.firestore
+        .collection(path)
+        .doc(i.toString())
+        .set(song);
+      i++;
+    });
+    batch.commit();
   }
 
   updateHistory(history: Song[]) {
@@ -251,11 +284,19 @@ export class DbService {
     if (currentSong) {
       queue.unshift(currentSong);
     }
-    const path = "guilds/" + this.auth.selectedServer.value.id + "/VC";
-    this.firestore
-      .collection(path)
-      .doc("queue")
-      .set({ queue: queue });
+    const path =
+      "guilds/" + this.auth.selectedServer.value.id + "/VC/queue/songs";
+    let i = 0;
+    var batch = this.firestore.firestore.batch();
+    queue.forEach(song => {
+      song.pos = i;
+      this.firestore
+        .collection(path)
+        .doc(i.toString())
+        .set(song);
+      i++;
+    });
+    batch.commit();
   }
 
   // Push song to user history, update dateAdded/timesAdded as necessary
