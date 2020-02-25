@@ -4,6 +4,7 @@ import { environment } from "src/environments/environment";
 import { AuthService } from "./auth.service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { AngularFirestore } from "@angular/fire/firestore";
+import { SongComponent } from "./song/song.component";
 
 export interface Playlist {
   source: string; // Spotify, Youtube, Firestore
@@ -15,6 +16,7 @@ export interface Playlist {
 export interface Song {
   title: string;
   url?: string;
+  uid?: string;
   id?: string;
   data?: any;
   thumbnail: string;
@@ -208,13 +210,16 @@ export class DbService {
       "guilds/" + this.auth.selectedServer.value.id + "/VC/queue/songs";
     this.firestore
       .collection(path)
-      .doc(queue.length.toString())
+      .doc(song.uid)
       .delete();
     queue.splice(pos, 1);
     this.updateQueue(queue);
   }
   skipCurrent() {
     const queue = this.queue.value;
+    const current = this.currentSong.value;
+    const controller = this.controller.value;
+    const loop = controller.loop;
     var history = Object.assign([], this.history.value);
     if (!history) {
       history = [];
@@ -228,22 +233,42 @@ export class DbService {
     const path =
       "guilds/" + this.auth.selectedServer.value.id + "/VC/queue/songs";
     //delete last song to prevent duplicates
-
-    this.firestore
-      .collection(path)
-      .doc(queue.length.toString())
-      .delete();
     var batch = this.firestore.firestore.batch();
     let i = 0;
     // upload new queue
     queue.forEach(song => {
       song.pos = i;
+      song.uid = song.uid ? song.uid : song.id + new Date().toUTCString();
       this.firestore
         .collection(path)
-        .doc(i.toString())
+        .doc(song.uid)
         .set(song);
       i++;
     });
+    if (loop == 0) {
+      this.firestore
+        .collection(path)
+        .doc(current.uid)
+        .delete();
+    } else {
+      console.log(i);
+      current.pos = i;
+      current.uid = current.uid
+        ? current.uid
+        : current.id + new Date().toUTCString();
+      this.firestore
+        .collection(path)
+        .doc(current.uid)
+        .set(current);
+      if (loop == 2) {
+        this.updateController({
+          loop: 1,
+          pauseState: controller.pauseState,
+          volume: controller.volume,
+          shuffleMode: controller.shuffleMode
+        });
+      }
+    }
     batch.commit();
   }
 
@@ -261,8 +286,9 @@ export class DbService {
     const currentSong = this.currentSong.value;
     const queue = this.queue.value;
     queue.unshift(currentSong);
-    this.currentSong.next(history[0]);
-    history.shift();
+    console.log(history[0].title);
+    this.currentSong.next(history.shift());
+    console.log(this.currentSong.value.title);
     this.updateHistory(history);
     this.updateQueue(queue);
   }
@@ -282,6 +308,11 @@ export class DbService {
     this.queue.next(Object.assign([], queue));
     const currentSong = this.currentSong.value;
     if (currentSong) {
+      console.log(this.currentSong.value.title);
+      currentSong.uid =
+      currentSong.uid && currentSong.uid != ""
+        ? currentSong.uid
+        : currentSong.id + new Date().toUTCString();
       queue.unshift(currentSong);
     }
     const path =
@@ -290,9 +321,13 @@ export class DbService {
     var batch = this.firestore.firestore.batch();
     queue.forEach(song => {
       song.pos = i;
+      song.uid =
+        song.uid && song.uid != ""
+          ? song.uid
+          : song.id + new Date().toUTCString();
       this.firestore
         .collection(path)
-        .doc(i.toString())
+        .doc(song.uid)
         .set(song);
       i++;
     });
