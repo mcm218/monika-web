@@ -6,14 +6,18 @@
 }
 #online-users {
   margin-top: 0;
-  width: flex;
+  padding-left: 30px;
+  width: 100%;
 }
 #online-user{
   margin: 0 5px;
+  padding: 0;
+  max-width: 80px;
 }
 #online-user-controls{
   margin: 0;
   margin-left: 10px;
+  max-width: 20px;
 }
 .container-fluid {
   background-color: rgb(22, 22, 22, 0);
