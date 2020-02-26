@@ -133,29 +133,26 @@ export class DbService {
         const prev = this.currentSong.value;
         //update history when song finishes
         const history = this.history.value ? this.history.value : [];
-        if (
-          prev &&
-          dbQueue &&
-          dbQueue.length > 0 &&
-          prev.uid != (dbQueue as Song[])[0].uid
-        ) {
-          console.log("Playing new song...");
-          // don't add to history if user hit previous button
-          if (
-            history.length == 0 ||
-            history[0].uid != (dbQueue as Song[])[0].uid
-          ) {
-            console.log("Previous song ended... adding to history");
-            history.unshift(prev);
-            if (history.length > 20) {
-              history.pop();
-            }
-          } else if (history.length > 0) {
-            console.log("User hit previous... removing from history");
-            history.shift();
-          }
-          ref.doc("history").set({ history: history });
-        }
+        // if (
+        //   prev &&
+        //   dbQueue &&
+        //   dbQueue.length > 0 &&
+        //   prev.uid != (dbQueue as Song[])[0].uid
+        // ) {
+        //   console.log("Playing new song...");
+        //   // don't add to history if user hit previous button
+        //   if (
+        //     history.length == 0 ||
+        //     history[0].uid != prev.uid
+        //   ) {
+        //     console.log("Previous song ended... adding to history");
+        //     history.unshift(prev);
+        //     if (history.length > 20) {
+        //       history.pop();
+        //     }
+        //   }
+        //   ref.doc("history").set({ history: history });
+        // }
         var currentSong = dbQueue.splice(0, 1)[0];
         this.currentSong.next(currentSong);
         this.queue.next(dbQueue);
@@ -225,14 +222,30 @@ export class DbService {
     queue.splice(pos, 1);
     this.updateQueue(queue);
   }
+
+  updateHistory(songs: Song[]) {
+    const path = "guilds/" + this.auth.selectedServer.value.id + "/VC/";
+    while(songs.length > 20){
+      songs.pop();
+    }
+    this.history.next(songs);
+    this.firestore
+      .collection(path)
+      .doc("history")
+      .set({ history: songs });
+  }
   skipCurrent() {
     const queue = this.queue.value;
+    const history = this.history.value;
     const current = this.currentSong.value;
     const controller = this.controller.value;
     const loop = controller.loop;
     this.queue.next(Object.assign([], queue));
     const path =
       "guilds/" + this.auth.selectedServer.value.id + "/VC/queue/songs";
+    // update history
+    history.unshift(current);
+    this.updateHistory(history);
     //delete last song to prevent duplicates
     var batch = this.firestore.firestore.batch();
     let i = 0;
@@ -289,9 +302,11 @@ export class DbService {
     this.queue.next(Object.assign([], queue));
     if (prevSong) {
       prevSong.uid = prevSong.id + Date.now().toString();
-      history[0].uid = prevSong.uid;
       queue.unshift(prevSong);
     }
+    // update history
+    history.shift();
+    this.updateHistory(history);
     const path =
       "guilds/" + this.auth.selectedServer.value.id + "/VC/queue/songs";
     let i = 0;
