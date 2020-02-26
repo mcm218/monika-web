@@ -8,7 +8,7 @@ img {
 .card {
   background-color: black;
   min-height: 300px;
-  max-width: 400px;
+  max-width: 600px;
   color: white;
   border-radius: 20px;
 }
@@ -62,7 +62,7 @@ img {
   top: 50%;
   padding: 0;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   background: rgba(0, 0, 0, 0);
   background: linear-gradient(
     rgba(0, 0, 0, 0) 0,
