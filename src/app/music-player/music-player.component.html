@@ -4,8 +4,34 @@
     <div id="block"></div>
     <div id="title" class="d-block d-md-none">{{ song.title }}</div>
     <div id="artist" class="d-block d-md-none">{{ song.artist }}</div>
+    <div id="favoriteButton" class="d-block d-md-none">
+      <button (click)="toggleFavorite(song)">
+        <div *ngIf="isFavorite(song.id); else favElseBlock">
+          <fa-icon [icon]="faSolidHeart" size="2x"></fa-icon>
+        </div>
+        <ng-template #favElseBlock>
+          <fa-icon [icon]="faHeart" size="2x"></fa-icon>
+        </ng-template>
+      </button>
+    </div>
     <div id="titleLarge" class="d-none d-md-block">{{ song.title }}</div>
     <div id="artistLarge" class="d-none d-md-block">{{ song.artist }}</div>
+    <div id="favoriteButtonLarge" class="d-none d-md-block">
+      <button (click)="toggleFavorite(song)">
+        <div *ngIf="isFavorite(song.id); else favElseBlock">
+          <fa-icon [icon]="faSolidHeart" class="active" size="2x"></fa-icon>
+        </div>
+        <ng-template #favElseBlock>
+          <fa-icon [icon]="faHeart" class="active" size="2x"></fa-icon>
+        </ng-template>
+      </button>
+    </div>
+    <mat-progress-bar
+      id="scrollBar"
+      class="d-none d-md-block"
+      mode="determinate"
+      [value]="percentOfSong"
+    ></mat-progress-bar>
     <div id="controls" class="justify-content-center d-md-none">
       <!-- Shuffle -->
       <button class="col-2W" (click)="shuffle()">
@@ -18,10 +44,10 @@
       <!-- Pause/Play -->
       <button class="col-2" (click)="togglePlay()">
         <div *ngIf="controller.pauseState; else elseBlock">
-          <fa-icon [icon]="faPause" size="2x"></fa-icon>
+          <fa-icon [icon]="faPlay" size="2x"></fa-icon>
         </div>
         <ng-template #elseBlock>
-          <fa-icon [icon]="faPlay" size="2x"></fa-icon>
+          <fa-icon [icon]="faPause" size="2x"></fa-icon>
         </ng-template>
       </button>
       <!-- Skip -->

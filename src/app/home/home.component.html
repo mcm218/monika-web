@@ -43,11 +43,14 @@
         "
       />
     </a> -->
-    <div id="online-users" class="row justify-content-start">
-      <div id="online-user" class="col d-none d-md-block" *ngFor="let user of onlineUsers; let i = index">
-        <div class="row" *ngIf="i < 6">
+    <div id="online-users">
+      <span
+        class="d-none d-md-inline"
+        *ngFor="let user of onlineUsers; let i = index"
+      >
+        <span id="online-user" *ngIf="i < 10">
           <img
-            class="avatar"
+            class="avatar user"
             [src]="
               'https://cdn.discordapp.com/avatars/' +
               user.id +
@@ -55,20 +58,20 @@
               user.avatar
             "
           />
-          <div id="online-user-controls" *ngIf="user.muted || user.deaf" class="col">
+          <span class="online-user-controls">
             <fa-icon
-              class="active row px-auto"
+              class="user-control"
               *ngIf="user.muted"
               [icon]="faMicrophoneSlash"
             ></fa-icon>
             <fa-icon
-              class="active row px-auto"
+              class="user-control"
               *ngIf="user.deaf"
               [icon]="faPhoneSlash"
             ></fa-icon>
-          </div>
-        </div>
-      </div>
+          </span>
+        </span>
+      </span>
     </div>
     <!-- </div>
     <button

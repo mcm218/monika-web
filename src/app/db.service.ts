@@ -35,6 +35,10 @@ export interface MusicController {
   pauseState: boolean;
   shuffleMode: boolean;
   volume: number;
+  pauseTime?: number;
+  resumeTime?: number;
+  startTime?: number;
+  duration?: number;
 }
 
 @Injectable({
@@ -182,11 +186,12 @@ export class DbService {
   }
 
   updateController(controller: MusicController) {
+    controller.shuffleMode = false;
     const path = "guilds/" + this.auth.selectedServer.value.id + "/VC";
     this.firestore
       .collection(path)
       .doc("controller")
-      .set(controller);
+      .set(controller, { merge: true });
   }
 
   addToQueue(song: Song) {
@@ -225,7 +230,7 @@ export class DbService {
 
   updateHistory(songs: Song[]) {
     const path = "guilds/" + this.auth.selectedServer.value.id + "/VC/";
-    while(songs.length > 20){
+    while (songs.length > 20) {
       songs.pop();
     }
     this.history.next(songs);
@@ -295,7 +300,9 @@ export class DbService {
     const currentSong = Object.assign({}, this.currentSong.value);
     const queue = Object.assign([], this.queue.value);
     // add current song to queue list
-    queue.unshift(currentSong);
+    if (currentSong && currentSong.uid) {
+      queue.unshift(currentSong);
+    }
     // grab previous song
     const prevSong = history[0];
     // push prev song to queue, if it exists
@@ -336,10 +343,10 @@ export class DbService {
   }
 
   updateQueue(queue: Song[]) {
+    queue = Object.assign([], queue);
     this.queue.next(Object.assign([], queue));
     const currentSong = this.currentSong.value;
     if (currentSong) {
-      console.log(this.currentSong.value.title);
       currentSong.uid =
         currentSong.uid && currentSong.uid != ""
           ? currentSong.uid

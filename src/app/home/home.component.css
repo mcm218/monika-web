@@ -5,19 +5,38 @@
   margin-top: 50px;
 }
 #online-users {
-  margin-top: 0;
-  padding-left: 30px;
+  position: relative;
+  height: 50px;
+  padding-left: 100px;
   width: 100%;
 }
 #online-user{
+  position: relative;
+  vertical-align: text-top;
   margin: 0 5px;
   padding: 0;
   max-width: 80px;
 }
-#online-user-controls{
+.user{
+  margin-top: 3px;
+  display: inline-block;
+}
+.online-user-controls{
+  text-align: center;
   margin: 0;
-  margin-left: 10px;
-  max-width: 20px;
+  padding: 0;
+  /* margin-left: 10px; */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  /* width: 20px; */
+  /* display: inline-block; */
+}
+.user-control{
+  display: inline;
+  color: white;
+  /* padding-right: 5px; */
 }
 .container-fluid {
   background-color: rgb(22, 22, 22, 0);

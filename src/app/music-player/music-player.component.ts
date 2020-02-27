@@ -1,31 +1,92 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input, OnChanges } from "@angular/core";
 import {
   faPlay,
   faForward,
   faRandom,
   faBackward,
   faRedo,
-  faPause
+  faPause,
+  faHeart as faSolidHeart
 } from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { Song, MusicController, DbService } from "../db.service";
+import { Subscription, interval } from "rxjs";
 @Component({
   selector: "app-music-player",
   templateUrl: "./music-player.component.html",
   styleUrls: ["./music-player.component.css"]
 })
-export class MusicPlayerComponent implements OnInit {
+export class MusicPlayerComponent implements OnChanges {
   @Input() controller: MusicController;
   @Input() song: Song;
-
   faPlay = faPlay;
   faForward = faForward;
   faRandom = faRandom;
   faBackward = faBackward;
   faRedo = faRedo;
   faPause = faPause;
+  faSolidHeart = faSolidHeart;
+  faHeart = faHeart;
+  curTime = 0;
+  percentOfSong = 0;
+  interval = 0;
+  tickDurationMS = 100;
+  timerSub: Subscription;
   constructor(private db: DbService) {}
+  startTimer() {}
 
-  ngOnInit() {}
+  ngOnChanges() {
+    if (
+      this.controller &&
+      this.controller.startTime &&
+      this.controller.duration
+    ) {
+      const now = Date.now();
+      if (this.controller.pauseTime != -1 && this.controller.resumeTime != -1) {
+        this.curTime =
+          now -
+          this.controller.resumeTime +
+          this.controller.pauseTime -
+          this.controller.startTime;
+      } else if (this.controller.pauseTime != -1) {
+        this.curTime = this.controller.pauseTime - this.controller.startTime;
+      } else {
+        this.curTime = now - this.controller.startTime;
+      }
+      this.percentOfSong =
+        (this.curTime / 1000 / this.controller.duration) * 100;
+      // get how many percent the bar moves in a tickDurationMS
+      // divide by tickDurationMS -> convert to 100MS units
+      // divide by 100 -> get MS per percent
+      this.interval = 100 / this.controller.duration / 10;
+      console.log(this.interval);
+      if (this.timerSub) {
+        this.timerSub.unsubscribe();
+      }
+      if (this.controller.pauseState) {
+        return;
+      }
+      const timer$ = interval(this.tickDurationMS);
+      this.timerSub = timer$.subscribe(() => {
+        if (this.percentOfSong + this.interval > 100) {
+          this.percentOfSong = 100;
+          this.timerSub.unsubscribe();
+        } else {
+          this.percentOfSong += this.interval;
+        }
+      });
+    }
+  }
+
+  async updateTimePercent() {}
+
+  toggleFavorite(song: Song) {
+    this.db.toggleFavorite(song);
+  }
+
+  isFavorite(id: string): boolean {
+    return this.db.isFavorite(id);
+  }
 
   // Reorder queue, update
   shuffle(): void {

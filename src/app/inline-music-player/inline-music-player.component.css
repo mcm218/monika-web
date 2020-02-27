@@ -14,19 +14,30 @@
 .controls {
   text-align: center;
 }
+#controls{
+  margin: 0;
+  text-align: center;
+}
 p {
   margin: 0;
-  margin-top: 5px;
-  margin-left: 5px;
+  padding: 0;
+  margin-left: 10px;
   color: white;
 }
 .thumbnail{
-  margin-left: 20px;
+  display: inline-block;
+}
+#text{
+  display: inline-block;
+}
+#bottom-bar{
+  margin-left: 0px;
 }
 .artist {
   color: #e16035;
 }
 #slidercontainer {
+  padding-right: 10px;
   text-align: end;
 }
 /* The slider itself */

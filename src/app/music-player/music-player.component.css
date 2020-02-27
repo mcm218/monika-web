@@ -35,12 +35,30 @@ img {
   top: 83%;
   left: 0;
   width: 100%;
+  font-size: 20px;
   text-align: center;
 }
 #artistLarge {
   position: absolute;
   top: 90%;
   left: 0;
+  width: 100%;
+  font-size: 20px;
+  text-align: center;
+  color: #e16035;
+}
+#favoriteButton {
+  position: absolute;
+  top: 1%;
+  left: 40%;
+  width: 100%;
+  text-align: center;
+  color: #e16035;
+}
+#favoriteButtonLarge {
+  position: absolute;
+  top: 85%;
+  left: 40%;
   width: 100%;
   text-align: center;
   color: #e16035;
@@ -52,6 +70,13 @@ img {
   width: 100%;
   height: 80px;
   padding: 10px 0;
+  text-align: center;
+}
+#scrollBar {
+  position: absolute;
+  top: 99.2%;
+  left: 1.5%;
+  width: 97%;
   text-align: center;
 }
 #block {

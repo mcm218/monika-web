@@ -10,6 +10,7 @@ import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { CookieService } from "ngx-cookie-service";
 import { ToastrModule } from "ngx-toastr";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -54,7 +55,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
     ToastrModule.forRoot({
       timeOut: 2000,
       positionClass: "toast-top-center"
-    })
+    }),
+    MatProgressBarModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]

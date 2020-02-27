@@ -46,7 +46,9 @@ export class InlineMusicPlayerComponent implements OnInit {
 
   //
   nextSong(): void {
-    this.db.skipCurrent();
+    if (this.song) {
+      this.db.skipCurrent();
+    }
   }
 
   toggleLoop(): void {
