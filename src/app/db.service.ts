@@ -132,32 +132,6 @@ export class DbService {
           dbQueue.push(data);
         });
         dbQueue.sort((a, b) => a.pos - b.pos);
-
-        // var data = snapshot.payload.data() as { queue: [] };
-        //check if need to update history
-        const prev = this.currentSong.value;
-        //update history when song finishes
-        const history = this.history.value ? this.history.value : [];
-        // if (
-        //   prev &&
-        //   dbQueue &&
-        //   dbQueue.length > 0 &&
-        //   prev.uid != (dbQueue as Song[])[0].uid
-        // ) {
-        //   console.log("Playing new song...");
-        //   // don't add to history if user hit previous button
-        //   if (
-        //     history.length == 0 ||
-        //     history[0].uid != prev.uid
-        //   ) {
-        //     console.log("Previous song ended... adding to history");
-        //     history.unshift(prev);
-        //     if (history.length > 20) {
-        //       history.pop();
-        //     }
-        //   }
-        //   ref.doc("history").set({ history: history });
-        // }
         var currentSong = dbQueue.splice(0, 1)[0];
         this.currentSong.next(currentSong);
         this.queue.next(dbQueue);
@@ -346,12 +320,8 @@ export class DbService {
   updateQueue(queue: Song[]) {
     queue = Object.assign([], queue);
     this.queue.next(Object.assign([], queue));
-    const currentSong = this.currentSong.value;
+    const currentSong = Object.assign([], this.currentSong.value);
     if (currentSong) {
-      currentSong.uid =
-        currentSong.uid && currentSong.uid != ""
-          ? currentSong.uid
-          : currentSong.id + Date.now().toString();
       queue.unshift(currentSong);
     }
     const path =
