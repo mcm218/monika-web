@@ -320,8 +320,8 @@ export class DbService {
   updateQueue(queue: Song[]) {
     queue = Object.assign([], queue);
     this.queue.next(Object.assign([], queue));
-    const currentSong = Object.assign([], this.currentSong.value);
-    if (currentSong) {
+    const currentSong = Object.assign({}, this.currentSong.value);
+    if (this.currentSong.value) {
       queue.unshift(currentSong);
     }
     const path =
@@ -466,7 +466,6 @@ export class DbService {
             var song: Song = {
               title: item.track.name,
               artist: item.track.artists[0].name,
-              data: item.track,
               thumbnail: item.track.album.images[0]
                 ? item.track.album.images[0].url
                 : undefined,
@@ -606,8 +605,6 @@ export class DbService {
             source: "spotify",
             title: track.name,
             artist: track.artists[0].name,
-            data: track,
-
             thumbnail: track.album.images[0]
               ? track.album.images[0].url
               : undefined
@@ -665,8 +662,7 @@ export class DbService {
               source: "spotify",
               thumbnail: album.thumbnail,
               title: tracks[i].name,
-              artist: tracks[i].artists[0].name,
-              data: tracks[i]
+              artist: tracks[i].artists[0].name
             });
             await this.delay(200);
           }
