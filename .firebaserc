@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "monika-discord-bot"
+  },
+  "targets": {
+    "monika-discord-bot": {
+      "hosting": {
+        "music": [
+          "monika-music"
+        ]
+      }
+    }
   }
 }

@@ -68,11 +68,26 @@ export class MusicPlayerComponent implements OnChanges {
       }
       const timer$ = interval(this.tickDurationMS);
       this.timerSub = timer$.subscribe(() => {
+        const now = Date.now();
+        if (
+          this.controller.pauseTime != -1 &&
+          this.controller.resumeTime != -1
+        ) {
+          this.curTime =
+            now -
+            this.controller.resumeTime +
+            this.controller.pauseTime -
+            this.controller.startTime;
+        } else if (this.controller.pauseTime != -1) {
+          this.curTime = this.controller.pauseTime - this.controller.startTime;
+        } else {
+          this.curTime = now - this.controller.startTime;
+        }
+        this.percentOfSong =
+          (this.curTime / 1000 / this.controller.duration) * 100;
         if (this.percentOfSong + this.interval > 100) {
           this.percentOfSong = 100;
           this.timerSub.unsubscribe();
-        } else {
-          this.percentOfSong += this.interval;
         }
       });
     }
