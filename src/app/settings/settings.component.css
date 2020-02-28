@@ -11,6 +11,7 @@ a {
 
 .card {
   max-width: 400px;
+  max-height: 300px;
   text-align: start;
   margin: 16px auto;
   padding: 10px 20px;
@@ -23,4 +24,18 @@ a {
   padding: 0;
   padding-bottom: 10px;
   margin: 0;
+}
+.row-gutter{
+  height: calc(100vh - 110px);
+  margin: 0;
+  padding: 0;
+}
+.gutter-button{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  outline: none;
+}
+.below-card{
+  height: 100%;
 }
