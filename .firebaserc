@@ -7,6 +7,9 @@
       "hosting": {
         "music": [
           "monika-music"
+        ],
+        "old": [
+          "monika-discord-bot"
         ]
       }
     }

@@ -1,17 +1,26 @@
 {
-  "hosting": {
-    "public": "./dist/monika/",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
-    "target":"music"
-  }
+  "hosting": [
+    {
+      "public": "./dist/monika/",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "target": "music"
+    },
+    {
+      "public": "./dist/monika/",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "target": "old"
+    }
+  ]
 }
