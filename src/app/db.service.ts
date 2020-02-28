@@ -15,6 +15,7 @@ export interface Playlist {
 
 export interface Song {
   title: string;
+  youtubeTitle?: string;
   url?: string;
   uid?: string;
   id?: string;
@@ -520,7 +521,8 @@ export class DbService {
   }
 
   addSpotifySong(song: Song): void {
-    const query = (song.artist + " " + song.title).split(" ").join("+");
+    const query = (song.title + "+" + song.artist).split(" ").join("+");
+    console.log(query);
     this.firestore
       .collection("searches/videos/" + "spotify+" + query)
       .doc("results")
@@ -531,6 +533,7 @@ export class DbService {
           //Turn into function?
           song.id = result.id.videoId;
           song.url = "https://www.youtube.com/watch?v=" + song.id;
+          song.youtubeTitle = result.snippet.title;
           this.pushSong(song);
           song.user = this.auth.user.value;
           const queue = this.queue.value;
@@ -546,6 +549,7 @@ export class DbService {
                 //Turn into function?
                 song.id = result.id.videoId;
                 song.url = "https://www.youtube.com/watch?v=" + song.id;
+                song.youtubeTitle = result.snippet.title;
                 this.pushSong(song);
                 song.user = this.auth.user.value;
                 const queue = this.queue.value;
@@ -569,6 +573,7 @@ export class DbService {
           //Turn into function?
           song.id = result.id.videoId;
           song.url = "https://www.youtube.com/watch?v=" + song.id;
+          song.youtubeTitle = result.snippet.title;
 
           var date = new Date();
           var uid = this.auth.user.value.id;
@@ -592,6 +597,7 @@ export class DbService {
                 //Turn into function?
                 song.id = result.id.videoId;
                 song.url = "https://www.youtube.com/watch?v=" + song.id;
+                song.youtubeTitle = result.snippet.title;
 
                 var date = new Date();
                 var uid = this.auth.user.value.id;
@@ -797,6 +803,7 @@ export class DbService {
             results.push({
               source: "youtube",
               title: result.snippet.title,
+              youtubeTitle: result.snippet.title,
               id: result.id.videoId,
               url: "https://www.youtube.com/watch?v=" + result.id.videoId,
               thumbnail: thumbnail
@@ -824,6 +831,7 @@ export class DbService {
                   results.push({
                     source: "youtube",
                     title: result.snippet.title,
+                    youtubeTitle: result.snippet.title,
                     id: result.id.videoId,
                     url: "https://www.youtube.com/watch?v=" + result.id.videoId,
                     thumbnail: thumbnail
@@ -862,6 +870,7 @@ export class DbService {
             }
             results.push({
               title: result.snippet.title,
+              youtubeTitle: result.snippet.title,
               source: "playlist",
               thumbnail: thumbnail,
               id: result.id.playlistId
@@ -887,6 +896,7 @@ export class DbService {
                   }
                   results.push({
                     title: result.snippet.title,
+                    youtubeTitle: result.snippet.title,
                     source: "playlist",
                     thumbnail: thumbnail,
                     id: result.id.playlistId
@@ -922,6 +932,7 @@ export class DbService {
           }
           this.addToQueue({
             title: item.snippet.title,
+            youtubeTitle: item.snippet.title,
             id: item.snippet.resourceId.videoId,
             url:
               "https://www.youtube.com/watch?v=" +

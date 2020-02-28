@@ -13,11 +13,11 @@
     <div id="controls" class="row justify-content-center">
       <!-- Shuffle -->
       <button class="col-1 d-none d-md-block" (click)="shuffle()">
-        <fa-icon [icon]="faRandom"></fa-icon>
+        <fa-icon [icon]="faRandom" size="lg"></fa-icon>
       </button>
       <!-- Previous -->
       <button class="col-1 d-none d-md-block" (click)="prevSong()">
-        <fa-icon [icon]="faBackward"></fa-icon>
+        <fa-icon [icon]="faBackward" size="lg"></fa-icon>
       </button>
       <!-- Pause/Play -->
       <button class="col-2" (click)="togglePlay()">
@@ -30,19 +30,46 @@
       </button>
       <!-- Skip -->
       <button class="col-1 d-none d-md-block" (click)="nextSong()">
-        <fa-icon [icon]="faForward"></fa-icon>
+        <fa-icon [icon]="faForward" size="lg"></fa-icon>
       </button>
       <!-- Loop -->
       <button class="col-1 d-none d-md-block" (click)="toggleLoop()">
         <ng-container *ngIf="controller.loop == 0; else loopElseIfBlock">
-          <fa-icon [icon]="faRedo"></fa-icon>
+          <svg
+            style="fill: white;"
+            class="loop"
+            viewBox="0 0 48 48"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M0 0h48v48H0z" fill="none" />
+            <path
+              d="M14 14h20v6l8-8-8-8v6H10v12h4v-8zm20 20H14v-6l-8 8 8 8v-6h24V26h-4v8z"
+            />
+          </svg>
         </ng-container>
         <ng-template #loopElseIfBlock
           ><ng-container *ngIf="controller.loop == 1; else loopElseBlock">
-            <fa-icon [icon]="faRedo" class="active"></fa-icon> </ng-container
+            <svg
+              class="loop active"
+              viewBox="0 0 48 48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M0 0h48v48H0z" fill="none" />
+              <path
+                d="M14 14h20v6l8-8-8-8v6H10v12h4v-8zm20 20H14v-6l-8 8 8 8v-6h24V26h-4v8z"
+              /></svg></ng-container
         ></ng-template>
         <ng-template #loopElseBlock>
-          <fa-icon [icon]="faRedo" class="active"></fa-icon>
+          <svg
+            class="loop active"
+            viewBox="0 0 48 48"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M0 0h48v48H0z" fill="none" />
+            <path
+              d="M14 14h20v6l8-8-8-8v6H10v12h4v-8zm20 20H14v-6l-8 8 8 8v-6h24V26h-4v8zm-8-4V18h-2l-4 2v2h3v8h3z"
+            />
+          </svg>
         </ng-template>
       </button>
     </div>

@@ -14,9 +14,13 @@
 .controls {
   text-align: center;
 }
-#controls{
+#controls {
   margin: 0;
   text-align: center;
+}
+.loop {
+  height: 30px;
+  width: 30px;
 }
 p {
   margin: 0;
@@ -24,13 +28,13 @@ p {
   margin-left: 10px;
   color: white;
 }
-.thumbnail{
+.thumbnail {
   display: inline-block;
 }
-#text{
+#text {
   display: inline-block;
 }
-#bottom-bar{
+#bottom-bar {
   margin-left: 0px;
 }
 .artist {
@@ -80,4 +84,5 @@ p {
 }
 .active {
   color: #e16035;
+  fill: #e16035;
 }
