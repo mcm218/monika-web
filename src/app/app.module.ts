@@ -8,10 +8,11 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AngularFireAuthModule } from "@angular/fire/auth";
+import { AngularFireFunctionsModule } from "@angular/fire/functions"
 import { CookieService } from "ngx-cookie-service";
 import { ToastrModule } from "ngx-toastr";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -53,6 +54,7 @@ import { DesktopAuthComponent } from './desktop-auth/desktop-auth.component';
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    AngularFireFunctionsModule,
     DragDropModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
@@ -65,4 +67,4 @@ import { DesktopAuthComponent } from './desktop-auth/desktop-auth.component';
   providers: [CookieService],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

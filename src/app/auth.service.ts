@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
 import { AngularFirestore } from "@angular/fire/firestore";
+import { AngularFireAuth } from "@angular/fire/auth";
+import { AngularFireFunctions } from "@angular/fire/functions";
 import { CookieService } from "ngx-cookie-service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Router } from "@angular/router";
@@ -34,9 +36,25 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private fireAuth: AngularFireAuth,
+    private fireFunctions: AngularFireFunctions,
     private firestore: AngularFirestore
   ) { }
 
+
+  firebaseSignIn(user: any) {
+    this.fireFunctions.httpsCallable("getUserToken")({ userId: user.id }).subscribe(async res => {
+      if (res.status == 400) {
+        console.log(res.msg);
+      } else if (res.customToken) {
+        console.log("Signing user in...");
+        await this.fireAuth.auth.signInWithCustomToken(res.customToken);
+        console.log(this.fireAuth.auth.currentUser.uid);
+        this.user.next(user);
+      }
+    })
+
+  }
   async uploadAuthData(id: string, url: string, code: string) {
     console.log("Uploading auth data...")
     await this.firestore.collection("users").doc(id).set({ url: url, code: code }, { merge: true });
@@ -240,7 +258,7 @@ export class AuthService {
         response => {
           let user = response as any;
           this.createUser(user);
-          this.user.next(user);
+          this.firebaseSignIn(user);
           // this.verifyVoice();
         },
         error => {

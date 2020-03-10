@@ -64,6 +64,7 @@ export class HomeComponent implements OnInit {
     });
     this.auth.user.subscribe(user => {
       if (user) {
+        console.log("Getting user data...");
         this.user = user;
         this.db.getLists();
         this.db.playlists.subscribe(playlists => (this.playlists = playlists));
