@@ -6,6 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "start:electron": "ng build --base-href ./ && electron .",
+    "fast:electron": "electron .",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -29,6 +30,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.12.1",
     "@fortawesome/free-regular-svg-icons": "^5.12.1",
     "@fortawesome/free-solid-svg-icons": "^5.12.1",
+    "angular-local-storage": "^0.7.1",
     "bootstrap": "^4.4.1",
     "electron-oauth-helper": "^5.0.3",
     "firebase": "^7.8.2",
@@ -36,6 +38,7 @@
     "jquery": "^3.4.1",
     "ngx-cookie-service": "^2.3.0",
     "ngx-toastr": "^12.0.0",
+    "node-machine-id": "^1.1.12",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"

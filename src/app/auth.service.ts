@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subscription } from "rxjs";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { CookieService } from "ngx-cookie-service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
@@ -24,21 +24,54 @@ export class AuthService {
   servers = new BehaviorSubject<any[]>(undefined);
   user = new BehaviorSubject<any>(undefined);
 
+  public isElectron = false;
+
   youtubeAccessToken: string;
   discordAccessToken: string;
   spotifyAccessToken: string;
 
+  authSub: Subscription;
   constructor(
     private http: HttpClient,
-    private cookieService: CookieService,
     private router: Router,
     private firestore: AngularFirestore
-  ) {}
+  ) { }
+
+  async uploadAuthData(id: string, url: string, code: string) {
+    console.log("Uploading auth data...")
+    await this.firestore.collection("users").doc(id).set({ url: url, code: code }, { merge: true });
+  }
+
+  async desktopAuthorize(id: string, type: string) {
+    this.isElectron = true;
+    await this.firestore.collection("users").doc(id).set({ type: type }, { merge: true }).then(() => {
+      // Set up listener
+      console.log("Listening...")
+      this.authSub = this.firestore.collection("users").doc(id).snapshotChanges().subscribe(snapshot => {
+        // TODO: Create object for authData
+        const data = snapshot.payload.data() as any;
+        if (data.url && data.code) {
+          if (data.type === "discord") {
+            console.log("User authenticated!")
+            this.authorizeDiscord(data.url, data.code);
+            this.authSub.unsubscribe();
+          } else if (data.type === "spotify") {
+            this.authorizeSpotify(data.url, data.code);
+            this.authSub.unsubscribe();
+          } else if (data.type === "youtube") {
+            this.authorizeYoutube(data.url, data.code);
+            this.authSub.unsubscribe();
+          }
+          this.firestore.collection("users").doc(id).delete();
+        }
+      });
+    });
+  }
 
   authorize(url: string, code: string): void {
-    if (this.cookieService.check("discord-token")) {
+    if (localStorage.getItem("discord-token")) {
       //authorize spotify
-      if (this.cookieService.check("spotify-token")) {
+      if (localStorage.getItem("spotify-token")) {
         this.authorizeYoutube(url, code);
       } else {
         this.authorizeSpotify(url, code);
@@ -55,18 +88,24 @@ export class AuthService {
   // If user has begun authorization process(url/code provided), request access token
   authorizeDiscord(url?: string, code?: string): void {
     console.log("Authorizing Discord");
-    if (this.cookieService.check("discord-token")) {
-      this.discordAccessToken = this.cookieService.get("discord-token");
-      this.verifyServer();
-      this.authenticated.next(true);
-      return;
-    } else if (this.cookieService.check("discord-refresh-token")) {
-      this.discordRefreshToken();
-      return;
+    // Check AppData for token
+    this.discordAccessToken = localStorage.getItem("discord-token");
+    if (this.discordAccessToken) {
+      // If Date.now < expiration
+      let expiration: Date = new Date(localStorage.getItem("discord-expiration"));
+      if (new Date(Date.now()) < expiration) {
+        this.verifyServer();
+        this.authenticated.next(true);
+        return;
+      } else {
+        this.discordRefreshToken();
+        return;
+      }
     } else if (!url || !code) {
-      console.log("User not authenticated");
+      console.log("User not authorized to use Discord");
       return;
     }
+
     var body = new URLSearchParams();
     body.set("client_id", environment.discordData.client_id);
     body.set("client_secret", environment.discordData.client_secret);
@@ -85,23 +124,23 @@ export class AuthService {
         response => {
           this.authenticated.next(true);
           this.discordAccessToken = response["access_token"];
-          this.cookieService.set(
-            "discord-token",
-            response["access_token"],
-            new Date(
-              new Date().getTime() + Number(response["expires_in"] * 1000)
-            )
-          );
-          this.cookieService.set(
-            "discord-refresh-token",
-            response["refresh_token"]
-          );
+          // Set tokens in AppData
+          localStorage.setItem("discord-token", response["access_token"]);
+          localStorage.setItem("discord-expiration", new Date(
+            new Date().getTime() + Number(response["expires_in"] * 1000)
+          ).toString());
+          localStorage.setItem("discord-refresh-token", response["refresh_token"]);
+
           this.verifyServer();
-          this.router.navigate(["/"]);
+          if (!this.isElectron) {
+            this.router.navigate(["/"]);
+          }
         },
         error => {
           console.error(error);
-          this.router.navigate(["/"]);
+          if (!this.isElectron) {
+            this.router.navigate(["/"]);
+          }
         }
       );
   }
@@ -110,7 +149,8 @@ export class AuthService {
   discordRefreshToken() {
     var url = window.location.href;
     var body = new URLSearchParams();
-    var refreshToken = this.cookieService.get("discord-refresh-token");
+    var refreshToken;
+    refreshToken = localStorage.getItem("discord-refresh-token");
     body.set("client_id", environment.discordData.client_id);
     body.set("client_secret", environment.discordData.client_secret);
     body.set("grant_type", "refresh_token");
@@ -127,21 +167,16 @@ export class AuthService {
         response => {
           this.authenticated.next(true);
           this.discordAccessToken = response["access_token"];
-          this.cookieService.set(
-            "discord-token",
-            response["access_token"],
-            new Date(
-              new Date().getTime() + Number(response["expires_in"] * 1000)
-            )
-          );
-          this.cookieService.set(
-            "discord-refresh-token",
-            response["refresh_token"]
-          );
+          // Set tokens in local storage
+          localStorage.setItem("discord-token", response["access_token"]);
+          localStorage.setItem("discord-expiration", new Date(
+            new Date().getTime() + Number(response["expires_in"] * 1000)
+          ).toString());
+
           this.verifyServer();
         },
         error => {
-          this.cookieService.delete("discord-refresh-token");
+          localStorage.removeItem("discord-refresh-token");
           console.log(error);
         }
       );
@@ -180,7 +215,7 @@ export class AuthService {
           console.error(error);
           if (error.code == 401 || error.code == 403) {
             this.authenticated.next(false);
-            this.cookieService.deleteAll();
+            localStorage.clear();
           }
         }
       );
@@ -225,14 +260,20 @@ export class AuthService {
   // Spotify
   authorizeSpotify(url?: string, code?: string) {
     console.log("Authorizing Spotify");
-    if (this.cookieService.check("spotify-token")) {
-      this.spotifyAccessToken = this.cookieService.get("spotify-token");
-      this.spotifyAuth.next(true);
-      return;
-    } else if (this.cookieService.check("spotify-refresh-token")) {
-      this.spotifyRefreshToken();
-      return;
+    // Check AppData for token
+    this.spotifyAccessToken = localStorage.getItem("spotify-token");
+    if (this.spotifyAccessToken) {
+      // If Date.now < expiration
+      let expiration: Date = new Date(localStorage.getItem("spotify-expiration"));
+      if (new Date(Date.now()) < expiration) {
+        this.spotifyAuth.next(true);
+        return;
+      } else {
+        this.spotifyRefreshToken();
+        return;
+      }
     } else if (!url || !code) {
+      console.log("User not authorized to use Spotify");
       return;
     }
     var body = new URLSearchParams();
@@ -252,21 +293,18 @@ export class AuthService {
         response => {
           this.spotifyAccessToken = response["access_token"];
           this.spotifyAuth.next(true);
-          this.cookieService.set(
-            "spotify-token",
-            response["access_token"],
-            new Date(
-              new Date().getTime() + Number(response["expires_in"] * 1000)
-            )
-          );
-          this.cookieService.set(
-            "spotify-refresh-token",
-            response["refresh_token"]
-          );
-          this.router.navigate(["/"]);
+          // Set tokens in local storage
+          localStorage.setItem("spotify-token", response["access_token"]);
+          localStorage.setItem("spotify-expiration", new Date(
+            new Date().getTime() + Number(response["expires_in"] * 1000)
+          ).toString());
+          localStorage.setItem("spotify-refresh-token", response["refresh_token"]);
+          if (!this.isElectron) {
+            this.router.navigate(["/"]);
+          }
         },
         error => {
-          if (!this.cookieService.check("youtube-token")) {
+          if (!localStorage.getItem("youtube-token")) {
             this.authorizeYoutube(url, code);
           }
           console.log(error);
@@ -277,14 +315,14 @@ export class AuthService {
   spotifyRefreshToken() {
     console.log("Refreshing Spotify Token...");
     var body = new URLSearchParams();
-    var refreshToken = this.cookieService.get("spotify-refresh-token");
+    var refreshToken = localStorage.getItem("spotify-refresh-token");
     body.set("grant_type", "refresh_token");
     body.set("refresh_token", refreshToken);
     var headers = new HttpHeaders({
       Authorization: `Basic ${btoa(
         environment.spotifyData.client_id +
-          ":" +
-          environment.spotifyData.client_secret
+        ":" +
+        environment.spotifyData.client_secret
       )}`,
       "Content-Type": "application/x-www-form-urlencoded"
     });
@@ -296,16 +334,13 @@ export class AuthService {
           console.log(response);
           this.spotifyAccessToken = response["access_token"];
           this.spotifyAuth.next(true);
-          this.cookieService.set(
-            "spotify-token",
-            response["access_token"],
-            new Date(
-              new Date().getTime() + Number(response["expires_in"] * 1000)
-            )
-          );
+          localStorage.setItem("spotify-token", response["access_token"]);
+          localStorage.setItem("spotify-expiration", new Date(
+            new Date().getTime() + Number(response["expires_in"] * 1000)
+          ).toString());
         },
         error => {
-          this.cookieService.delete("spotify-refresh-token");
+          localStorage.removeItem("spotify-refresh-token");
           console.log(error);
         }
       );
@@ -315,14 +350,20 @@ export class AuthService {
 
   authorizeYoutube(url?: string, code?: string): void {
     console.log("Authorizing Youtube");
-    if (this.cookieService.check("youtube-token")) {
-      this.youtubeAccessToken = this.cookieService.get("youtube-token");
-      this.youtubeAuth.next(true);
-      return;
-    } else if (this.cookieService.check("youtube-refresh-token")) {
-      this.youtubeRefreshToken();
-      return;
+    // Check AppData for token
+    this.youtubeAccessToken = localStorage.getItem("youtube-token");
+    if (this.youtubeAccessToken) {
+      // If Date.now < expiration
+      let expiration: Date = new Date(localStorage.getItem("youtube-expiration"));
+      if (new Date(Date.now()) < expiration) {
+        this.youtubeAuth.next(true);
+        return;
+      } else {
+        this.youtubeRefreshToken();
+        return;
+      }
     } else if (!url || !code) {
+      console.log("User not authorized to use Youtube");
       return;
     }
     var body = new URLSearchParams();
@@ -341,21 +382,17 @@ export class AuthService {
         response => {
           this.youtubeAccessToken = response["access_token"];
           this.youtubeAuth.next(true);
-          this.cookieService.set(
-            "youtube-token",
-            response["access_token"],
-            new Date(
-              new Date().getTime() + Number(response["expires_in"] * 1000)
-            )
-          );
-          this.cookieService.set(
-            "youtube-refresh-token",
-            response["refresh_token"]
-          );
-          this.router.navigate(["/"]);
+          localStorage.setItem("youtube-token", response["access_token"]);
+          localStorage.setItem("youtube-expiration", new Date(
+            new Date().getTime() + Number(response["expires_in"] * 1000)
+          ).toString());
+          localStorage.setItem("youtube-refresh-token", response["refresh_token"]);
+          if (!this.isElectron) {
+            this.router.navigate(["/"]);
+          }
         },
         error => {
-          this.cookieService.delete("youtube-refresh-token");
+          localStorage.removeItem("youtube-refresh-token");
           console.log(error);
         }
       );
@@ -364,14 +401,14 @@ export class AuthService {
   youtubeRefreshToken(): void {
     console.log("Refreshing Youtube Token...");
     var body = new URLSearchParams();
-    var refreshToken = this.cookieService.get("youtube-refresh-token");
+    var refreshToken = localStorage.getItem("youtube-refresh-token");
     body.set("grant_type", "refresh_token");
     body.set("refresh_token", refreshToken);
     var headers = new HttpHeaders({
       Authorization: `Basic ${btoa(
         environment.youtubeData.client_id +
-          ":" +
-          environment.youtubeData.client_secret
+        ":" +
+        environment.youtubeData.client_secret
       )}`,
       "Content-Type": "application/x-www-form-urlencoded"
     });
@@ -382,16 +419,13 @@ export class AuthService {
         response => {
           this.youtubeAccessToken = response["access_token"];
           this.youtubeAuth.next(true);
-          this.cookieService.set(
-            "youtube-token",
-            response["access_token"],
-            new Date(
-              new Date().getTime() + Number(response["expires_in"] * 1000)
-            )
-          );
+          localStorage.setItem("youtube-token", response["access_token"]);
+          localStorage.setItem("youtube-expiration", new Date(
+            new Date().getTime() + Number(response["expires_in"] * 1000)
+          ).toString());
         },
         error => {
-          this.cookieService.delete("youtube-refresh-token");
+          localStorage.removeItem("youtube-refresh-token");
           console.log(error);
         }
       );

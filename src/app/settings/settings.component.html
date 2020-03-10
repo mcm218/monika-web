@@ -14,10 +14,10 @@
         <h4>Connect Accounts</h4>
       </div>
       <div class="row row-col-2">
-        <a class="mx-auto" [href]="youtubeUrl">
+        <a class="mx-auto" (click)="authYoutube()">
           <fa-icon [icon]="faYoutube" size="4x"></fa-icon>
         </a>
-        <a class="mx-auto" [href]="spotifyUrl">
+        <a class="mx-auto" (click)="authSpotify()">
           <fa-icon [icon]="faSpotify" size="4x"></fa-icon>
         </a>
       </div>

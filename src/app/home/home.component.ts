@@ -77,6 +77,9 @@ export class HomeComponent implements OnInit {
       const code = params["code"];
       const accessToken = params["access_token"];
       const url = window.location.href.split("?")[0];
+      if (url.search("file://") != -1) {
+        this.auth.isElectron = true;
+      }
       if (code) {
         this.auth.authorize(url, code);
       } else {

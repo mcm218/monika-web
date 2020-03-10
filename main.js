@@ -7,19 +7,13 @@ let mainWindow
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1500,
-    height: 750,
+    height: 1000,
     webPreferences: {
       nodeIntegration: true
     }
   })
 
-  mainWindow.loadURL(
-    url.format({
-      pathname: path.join(__dirname, `/dist/monika/`),
-      protocol: "file:",
-      slashes: true
-    })
-  );
+  mainWindow.loadFile("dist/monika/index.html");
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
 
@@ -40,13 +34,16 @@ app.on('activate', function () {
 
 
 function openAuthWindow(path) {
-  const { BrowserWindow } = require("electron");
   console.log(path);
-  let authWindow = new BrowserWindow({ show: false, height: 600, width: 1200 });
+  let authWindow = new BrowserWindow({ parent: mainWindow, show: false, height: 800, width: 1200 });
   authWindow.loadURL(path);
   authWindow.once("ready-to-show", () => {
     authWindow.show();
-  })
+  });
+  authWindow.on("closed", () => {
+    console.log("Auth window closed");
+    authWindow = null;
+  });
 }
 
 ipcMain.on("openAuthWindow", (event, arg) => {
