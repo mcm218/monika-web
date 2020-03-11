@@ -49,7 +49,6 @@ export class HomeComponent implements OnInit {
         this.auth.servers.subscribe(servers => (this.servers = servers));
         this.auth.selectedServer.subscribe(server => {
           this.selectedServer = server;
-          this.db.getMusicPlayerData();
         });
         this.db.queue.subscribe(queue => (this.queue = queue));
         this.db.onlineUsers.subscribe(users => (this.onlineUsers = users));
@@ -68,6 +67,7 @@ export class HomeComponent implements OnInit {
         console.log("Getting user data...");
         this.user = user;
         this.db.getLists();
+        this.db.getMusicPlayerData();
         this.db.playlists.subscribe(playlists => { this.playlists = playlists; changeDetectorRef.detectChanges() });
         this.db.selectedList.subscribe(list => (this.selectedList = list));
       }

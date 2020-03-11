@@ -51,21 +51,24 @@ export class AuthService {
         await this.fireAuth.auth.signInWithCustomToken(res.customToken);
         console.log(this.fireAuth.auth.currentUser.uid);
         this.user.next(user);
+        await this.updateUser(user);
+        // Load access tokens from Firebase
+        this.loadUserData(user);
       }
-    })
+    });
 
   }
   async uploadAuthData(id: string, url: string, code: string) {
     console.log("Uploading auth data...")
-    await this.firestore.collection("users").doc(id).set({ url: url, code: code }, { merge: true });
+    await this.firestore.collection("temp").doc(id).set({ url: url, code: code }, { merge: true });
   }
 
   async desktopAuthorize(id: string, type: string) {
     this.isElectron = true;
-    await this.firestore.collection("users").doc(id).set({ type: type }, { merge: true }).then(() => {
+    await this.firestore.collection("temp").doc(id).set({ type: type }, { merge: true }).then(() => {
       // Set up listener
       console.log("Listening...")
-      this.authSub = this.firestore.collection("users").doc(id).snapshotChanges().subscribe(snapshot => {
+      this.authSub = this.firestore.collection("temp").doc(id).snapshotChanges().subscribe(snapshot => {
         // TODO: Create object for authData
         const data = snapshot.payload.data() as any;
         if (data.url && data.code) {
@@ -80,7 +83,7 @@ export class AuthService {
             this.authorizeYoutube(data.url, data.code);
             this.authSub.unsubscribe();
           }
-          this.firestore.collection("users").doc(id).delete();
+          this.firestore.collection("temp").doc(id).delete();
         }
       });
     });
@@ -120,6 +123,7 @@ export class AuthService {
         return;
       }
     } else if (!url || !code) {
+      this.fireAuth.auth.signOut();
       console.log("User not authorized to use Discord");
       return;
     }
@@ -155,6 +159,8 @@ export class AuthService {
           }
         },
         error => {
+          this.authenticated.next(false);
+          this.fireAuth.auth.signOut();
           console.error(error);
           if (!this.isElectron) {
             this.router.navigate(["/"]);
@@ -194,7 +200,8 @@ export class AuthService {
           this.verifyServer();
         },
         error => {
-          localStorage.removeItem("discord-refresh-token");
+          this.authenticated.next(false);
+          this.fireAuth.auth.signOut();
           console.log(error);
         }
       );
@@ -257,7 +264,6 @@ export class AuthService {
       .subscribe(
         response => {
           let user = response as any;
-          this.createUser(user);
           this.firebaseSignIn(user);
           // this.verifyVoice();
         },
@@ -268,11 +274,43 @@ export class AuthService {
   }
 
   // Creates User collection for storing history, favorites
-  createUser(user: any): void {
-    this.firestore
+  async updateUser(user: any): Promise<void> {
+    if (localStorage.getItem("spotify-token")) {
+      user.spotifyAccessToken = localStorage.getItem("spotify-token");
+      user.spotifyExpiration = new Date(localStorage.getItem("spotify-expiration")).toString();
+      user.spotifyRefreshToken = localStorage.getItem("spotify-refresh-token");
+    }
+    if (localStorage.getItem("youtube-token")) {
+      user.youtubeAccessToken = localStorage.getItem("youtube-token");
+      user.youtubeExpiration = new Date(localStorage.getItem("youtube-expiration")).toString();
+      user.youtubeRefreshToken = localStorage.getItem("youtube-refresh-token");
+    }
+    await this.firestore
       .collection("users")
       .doc(user.id)
-      .set(user);
+      .set(user, { merge: true });
+  }
+
+  loadUserData(user: any): void {
+    this.firestore.collection("users").doc(user.id).get().subscribe(docSnapshot => {
+      let data = docSnapshot.data();
+      if (data.spotifyAccessToken) {
+        this.spotifyAccessToken = data.spotifyAccessToken;
+        localStorage.setItem("spotify-token", data.spotifyAccessToken);
+        localStorage.setItem("spotify-expiration", data.spotifyExpiration);
+        localStorage.setItem("spotify-refresh-token", data.spotifyRefreshToken);
+
+        this.authorizeSpotify();
+      }
+      if (data.youtubeAccessToken) {
+        this.youtubeAccessToken = data.youtubeAccessToken;
+        localStorage.setItem("youtube-token", data.youtubeAccessToken);
+        localStorage.setItem("youtube-expiration", data.youtubeExpiration);
+        localStorage.setItem("youtube-refresh-token", data.youtubeRefreshToken);
+
+        this.authorizeYoutube();
+      }
+    });
   }
 
   // Spotify
@@ -317,6 +355,9 @@ export class AuthService {
             new Date().getTime() + Number(response["expires_in"] * 1000)
           ).toString());
           localStorage.setItem("spotify-refresh-token", response["refresh_token"]);
+          if (this.user.value) {
+            this.updateUser(this.user.value);
+          }
           if (!this.isElectron) {
             this.router.navigate(["/"]);
           }
@@ -356,6 +397,9 @@ export class AuthService {
           localStorage.setItem("spotify-expiration", new Date(
             new Date().getTime() + Number(response["expires_in"] * 1000)
           ).toString());
+          if (this.user.value) {
+            this.updateUser(this.user.value);
+          }
         },
         error => {
           localStorage.removeItem("spotify-refresh-token");
@@ -405,6 +449,9 @@ export class AuthService {
             new Date().getTime() + Number(response["expires_in"] * 1000)
           ).toString());
           localStorage.setItem("youtube-refresh-token", response["refresh_token"]);
+          if (this.user.value) {
+            this.updateUser(this.user.value);
+          }
           if (!this.isElectron) {
             this.router.navigate(["/"]);
           }
@@ -441,6 +488,9 @@ export class AuthService {
           localStorage.setItem("youtube-expiration", new Date(
             new Date().getTime() + Number(response["expires_in"] * 1000)
           ).toString());
+          if (this.user.value) {
+            this.updateUser(this.user.value);
+          }
         },
         error => {
           localStorage.removeItem("youtube-refresh-token");

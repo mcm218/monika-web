@@ -8,6 +8,7 @@
     "start:electron": "ng build --base-href ./ && electron .",
     "fast:electron": "electron .",
     "build": "ng build",
+    "prod":"ng build --prod && firebase deploy --only hosting",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
