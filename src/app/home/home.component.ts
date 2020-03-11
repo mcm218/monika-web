@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
 import { AuthService } from "../auth.service";
 import { DbService, Playlist, Song, MusicController } from "../db.service";
 import {
@@ -40,7 +40,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private db: DbService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     this.auth.guildVerified.subscribe(guildVerified => {
       this.authenticated = guildVerified;
@@ -67,7 +68,7 @@ export class HomeComponent implements OnInit {
         console.log("Getting user data...");
         this.user = user;
         this.db.getLists();
-        this.db.playlists.subscribe(playlists => (this.playlists = playlists));
+        this.db.playlists.subscribe(playlists => { this.playlists = playlists; changeDetectorRef.detectChanges() });
         this.db.selectedList.subscribe(list => (this.selectedList = list));
       }
     });
