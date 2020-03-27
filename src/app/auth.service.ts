@@ -294,7 +294,7 @@ export class AuthService {
   loadUserData(user: any): void {
     this.firestore.collection("users").doc(user.id).get().subscribe(docSnapshot => {
       let data = docSnapshot.data();
-      if (data.spotifyAccessToken) {
+      if (!localStorage.getItem("spotify-token") && data.spotifyAccessToken) {
         this.spotifyAccessToken = data.spotifyAccessToken;
         localStorage.setItem("spotify-token", data.spotifyAccessToken);
         localStorage.setItem("spotify-expiration", data.spotifyExpiration);
@@ -302,7 +302,7 @@ export class AuthService {
 
         this.authorizeSpotify();
       }
-      if (data.youtubeAccessToken) {
+      if (!localStorage.getItem("youtube-token") && data.youtubeAccessToken) {
         this.youtubeAccessToken = data.youtubeAccessToken;
         localStorage.setItem("youtube-token", data.youtubeAccessToken);
         localStorage.setItem("youtube-expiration", data.youtubeExpiration);

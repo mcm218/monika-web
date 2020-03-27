@@ -11,6 +11,7 @@ import {
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { Song, MusicController, DbService } from "../db.service";
 import { Subscription, interval } from "rxjs";
+import { DomSanitizer } from '@angular/platform-browser';
 @Component({
   selector: "app-music-player",
   templateUrl: "./music-player.component.html",
@@ -19,6 +20,8 @@ import { Subscription, interval } from "rxjs";
 export class MusicPlayerComponent implements OnChanges {
   @Input() controller: MusicController;
   @Input() song: Song;
+  curSong: string;
+  embedLink;
   faPlay = faPlay;
   faForward = faForward;
   faRandom = faRandom;
@@ -32,10 +35,20 @@ export class MusicPlayerComponent implements OnChanges {
   interval = 0;
   tickDurationMS = 100;
   timerSub: Subscription;
-  constructor(private db: DbService) {}
-  startTimer() {}
+  constructor(private db: DbService, private sanitizer: DomSanitizer) { }
+  startTimer() { }
 
   ngOnChanges() {
+    if (this.song) {
+      if (this.curSong !== this.song.url) {
+        this.curSong = this.song.url;
+        console.log("NEW SONG");
+        this.embedLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.song.url.replace("watch?v=", "embed/") + "?autoplay=1&enablejsapi=1");
+      }
+      console.log(this.embedLink);
+    } else {
+      this.embedLink = null;
+    }
     if (
       this.controller &&
       this.controller.startTime &&
@@ -93,7 +106,7 @@ export class MusicPlayerComponent implements OnChanges {
     }
   }
 
-  async updateTimePercent() {}
+  async updateTimePercent() { }
 
   toggleFavorite(song: Song) {
     this.db.toggleFavorite(song);

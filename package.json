@@ -5,8 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:electron": "ng build --base-href ./ && electron .",
-    "fast:electron": "electron .",
+    "electron": "ng build --base-href ./ && electron .",
     "build": "ng build",
     "prod":"ng build --prod && firebase deploy --only hosting",
     "test": "ng test",

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { AuthService } from "../auth.service";
 
 @Component({
@@ -9,7 +9,7 @@ import { AuthService } from "../auth.service";
 })
 export class DesktopAuthComponent implements OnInit {
   discordUrl;
-  constructor(private auth: AuthService, private route: ActivatedRoute) { }
+  constructor(private auth: AuthService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
     // read code
@@ -26,6 +26,7 @@ export class DesktopAuthComponent implements OnInit {
         // close page
       } else {
         console.log("Something is missing!");
+        this.router.navigate(["/"]);
       }
     });
   }

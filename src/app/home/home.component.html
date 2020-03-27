@@ -5,35 +5,21 @@
       <fa-icon [icon]="settings ? faHome : faCog"></fa-icon>
     </button>
     <div id="server-select" *ngIf="selectedServer" class="dropdown nav-item">
-      <button
-        class="btn dropdown-toggle nav-item"
-        type="button"
-        id="serverMenuButton"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
+      <button class="btn dropdown-toggle nav-item" type="button" id="serverMenuButton" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
         {{ selectedServer.name }}
       </button>
       <div class="dropdown-menu" aria-labelledby="serverMenuButton">
-        <a
-          *ngFor="let server of servers"
-          (click)="selectServer(server)"
-          class="dropdown-item"
-          >{{ server.name }}</a
-        >
+        <a *ngFor="let server of servers" (click)="selectServer(server)" class="dropdown-item">{{ server.name }}</a>
       </div>
     </div>
     <a id="server-icon" *ngIf="selectedServer" class="navbar-brand nav-item">
-      <img
-        class="avatar"
-        [src]="
+      <img class="avatar" [src]="
           'https://cdn.discordapp.com/icons/' +
           selectedServer.id +
           '/' +
           selectedServer.icon
-        "
-      />
+        " />
     </a>
     <!-- <a id="user-avatar" *ngIf="user" class="navbar-brand nav-item">
       <img
@@ -44,31 +30,17 @@
       />
     </a> -->
     <div id="online-users">
-      <span
-        class="d-none d-md-inline"
-        *ngFor="let user of onlineUsers; let i = index"
-      >
+      <span class="d-none d-md-inline" *ngFor="let user of onlineUsers; let i = index">
         <span id="online-user" *ngIf="i < 10">
-          <img
-            class="avatar user"
-            [src]="
+          <img class="avatar user" [src]="
               'https://cdn.discordapp.com/avatars/' +
               user.id +
               '/' +
               user.avatar
-            "
-          />
+            " />
           <span class="online-user-controls">
-            <fa-icon
-              class="user-control"
-              *ngIf="user.muted"
-              [icon]="faMicrophoneSlash"
-            ></fa-icon>
-            <fa-icon
-              class="user-control"
-              *ngIf="user.deaf"
-              [icon]="faPhoneSlash"
-            ></fa-icon>
+            <fa-icon class="user-control" *ngIf="user.muted" [icon]="faMicrophoneSlash"></fa-icon>
+            <fa-icon class="user-control" *ngIf="user.deaf" [icon]="faPhoneSlash"></fa-icon>
           </span>
         </span>
       </span>
@@ -85,49 +57,37 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button> -->
-    <input
-      id="search-bar"
-      class="form-control mr-sm-2 d-none d-sm-block"
-      type="search"
-      placeHolder="Search"
-      aria-label="Search"
-      [formControl]="query"
-      (keyup.enter)="search()"
-    />
+    <input id="search-bar" class="form-control mr-sm-2 d-none d-sm-block" type="search" placeHolder="Search"
+      aria-label="Search" [formControl]="query" (keyup.enter)="search()" />
   </nav>
   <div id="home" class="row" style="height: 100%;">
-    <div
-      id="playlists"
-      class="col-sm-6 col-md-3 order-md-1 panel d-none d-sm-block"
-    >
+    <div id="playlists" class="col-sm-6 col-md-3 order-md-1 panel d-none d-sm-block">
       <app-lists [playlists]="playlists"></app-lists>
     </div>
     <div id="center" class="col-md col-sm-12 order-md-2 order-first">
       <!-- Not Authenticated -->
-      <div *ngIf="!authenticated; else settingsTab">
+      <div *ngIf="!authenticated; else mainScreen">
         <app-login></app-login>
       </div>
       <!-- Settings Tab -->
-      <ng-template #settingsTab>
+      <ng-template id="main-screen" #mainScreen>
+        <app-music-player class="abs-center" [song]=" currentSong" [controller]="controller">
+        </app-music-player>
         <div *ngIf="settings; else resultsTab">
-          <app-settings></app-settings>
+          <app-settings class="abs-center"></app-settings>
         </div>
         <!-- Results Tab -->
         <ng-template #resultsTab>
           <div *ngIf="results; else listTab">
-            <app-results-list></app-results-list>
+            <app-results-list class="abs-center"></app-results-list>
           </div>
           <!-- List Tab -->
           <ng-template #listTab>
             <div *ngIf="selectedList; else musicPlayer">
-              <app-list [playlist]="selectedList"></app-list>
+              <app-list class="abs-center" [playlist]="selectedList"></app-list>
             </div>
             <!-- Music Player Tab -->
             <ng-template #musicPlayer>
-              <app-music-player
-                [song]="currentSong"
-                [controller]="controller"
-              ></app-music-player>
             </ng-template>
           </ng-template>
         </ng-template>
@@ -138,10 +98,6 @@
     </div>
   </div>
   <nav id="music-player" class="navbar bottom-bar fixed-bottom navbar-dark bg">
-    <app-inline-music-player
-      [song]="currentSong"
-      [controller]="controller"
-      class="wide"
-    ></app-inline-music-player>
+    <app-inline-music-player [song]="currentSong" [controller]="controller" class="wide"></app-inline-music-player>
   </nav>
 </div>

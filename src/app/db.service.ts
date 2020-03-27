@@ -96,7 +96,7 @@ export class DbService {
     private firestore: AngularFirestore,
     private auth: AuthService,
     private http: HttpClient
-  ) {}
+  ) { }
 
   // Firestore
   getMusicPlayerData(): void {
@@ -128,7 +128,9 @@ export class DbService {
         // sort after reading doc
         const dbQueue = [];
         snapshots.forEach(snapshot => {
-          const data = snapshot.payload.doc.data();
+          let data = snapshot.payload.doc.data();
+          data.title = this.fixStringFormatting(data.title);
+          data.youtubeTitle = this.fixStringFormatting(data.youtubeTitle);
           dbQueue.push(data);
         });
         dbQueue.sort((a, b) => a.pos - b.pos);
@@ -329,6 +331,8 @@ export class DbService {
     let i = 0;
     var batch = this.firestore.firestore.batch();
     queue.forEach(song => {
+      song.title = this.fixStringFormatting(song.title);
+      if (song.youtubeTitle) song.youtubeTitle = this.fixStringFormatting(song.youtubeTitle);
       song.pos = i;
       song.uid =
         song.uid && song.uid != "" ? song.uid : song.id + Date.now().toString();
@@ -499,6 +503,8 @@ export class DbService {
       .subscribe(snapshot => {
         if (snapshot.exists) {
           const result = snapshot.data().items[0];
+          result.snippet.title = this.fixStringFormatting(result.snippet.title);
+
           //Turn into function?
           song.id = result.id.videoId;
           song.url = "https://www.youtube.com/watch?v=" + song.id;
@@ -514,6 +520,8 @@ export class DbService {
             .subscribe(
               response => {
                 const result = (response as any).items[0];
+
+                result.snippet.title = this.fixStringFormatting(result.snippet.title);
                 this.cacheSearch("spotify+" + query, response, true);
                 //Turn into function?
                 song.id = result.id.videoId;
@@ -539,6 +547,7 @@ export class DbService {
       .subscribe(snapshot => {
         if (snapshot.exists) {
           const result = snapshot.data().items[0];
+          result.snippet.title = this.fixStringFormatting(result.snippet.title);
           //Turn into function?
           song.id = result.id.videoId;
           song.url = "https://www.youtube.com/watch?v=" + song.id;
@@ -562,6 +571,7 @@ export class DbService {
             .subscribe(
               response => {
                 const result = (response as any).items[0];
+                result.snippet.title = this.fixStringFormatting(result.snippet.title);
                 this.cacheSearch("spotify+" + query, response, true);
                 //Turn into function?
                 song.id = result.id.videoId;
@@ -717,6 +727,7 @@ export class DbService {
             } else if (thumbnails.high) {
               thumbnail = thumbnails.high.url;
             }
+            item.snippet.title = this.fixStringFormatting(item.snippet.title);
             var song: Song = {
               title: item.snippet.title,
               id: item.snippet.resourceId.videoId,
@@ -728,6 +739,7 @@ export class DbService {
             };
             list.push(song);
           });
+          playlist.snippet.title = this.fixStringFormatting(playlist.snippet.title);
           const youtubeList: Playlist = {
             title: playlist.snippet.title,
             source: "youtube",
@@ -766,6 +778,7 @@ export class DbService {
             } else if (thumbnails.standard) {
               thumbnail = thumbnails.standard.url;
             }
+            result.snippet.title = this.fixStringFormatting(result.snippet.title);
             results.push({
               source: "youtube",
               title: result.snippet.title,
@@ -794,6 +807,7 @@ export class DbService {
                   } else if (thumbnails.standard) {
                     thumbnail = thumbnails.standard.url;
                   }
+                  result.snippet.title = this.fixStringFormatting(result.snippet.title);
                   results.push({
                     source: "youtube",
                     title: result.snippet.title,
@@ -834,6 +848,7 @@ export class DbService {
             } else if (thumbnails.standard) {
               thumbnail = thumbnails.standard.url;
             }
+            result.snippet.title = this.fixStringFormatting(result.snippet.title);
             results.push({
               title: result.snippet.title,
               youtubeTitle: result.snippet.title,
@@ -860,6 +875,7 @@ export class DbService {
                   } else if (thumbnails.standard) {
                     thumbnail = thumbnails.standard.url;
                   }
+                  result.snippet.title = this.fixStringFormatting(result.snippet.title);
                   results.push({
                     title: result.snippet.title,
                     youtubeTitle: result.snippet.title,
@@ -896,6 +912,7 @@ export class DbService {
           } else if (thumbnails.high) {
             thumbnail = thumbnails.high.url;
           }
+          item.snippet.title = this.fixStringFormatting(item.snippet.title);
           this.addToQueue({
             title: item.snippet.title,
             youtubeTitle: item.snippet.title,
@@ -1066,7 +1083,7 @@ export class DbService {
       "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
       "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
       "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-        "(\\#[-a-z\\d_]*)?$",
+      "(\\#[-a-z\\d_]*)?$",
       "i"
     ); // fragment locator
     return !!pattern.test(str);
@@ -1074,5 +1091,11 @@ export class DbService {
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  fixStringFormatting(str: string): string {
+    str = str.replace(/&#39;/g, "'");
+    str = str.replace(/&amp;/g, "&");
+    str = str.replace(/&quot;/g, "\"");
+    return str;
   }
 }

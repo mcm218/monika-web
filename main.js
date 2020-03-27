@@ -8,6 +8,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 1000,
+    frame: false,
     webPreferences: {
       nodeIntegration: true
     }
@@ -15,7 +16,7 @@ function createWindow() {
 
   mainWindow.loadFile("dist/monika/index.html");
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
     mainWindow = null

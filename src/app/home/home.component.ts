@@ -68,8 +68,8 @@ export class HomeComponent implements OnInit {
         this.user = user;
         this.db.getLists();
         this.db.getMusicPlayerData();
-        this.db.playlists.subscribe(playlists => { this.playlists = playlists; changeDetectorRef.detectChanges() });
-        this.db.selectedList.subscribe(list => (this.selectedList = list));
+        this.db.playlists.subscribe(playlists => { this.playlists = playlists; changeDetectorRef.detectChanges(); });
+        this.db.selectedList.subscribe(list => { this.selectedList = list; changeDetectorRef.detectChanges(); });
       }
     });
   }

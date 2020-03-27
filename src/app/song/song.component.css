@@ -2,7 +2,7 @@
   margin: 0px;
   text-align: start;
 }
-.artist {
+.artist, .active {
   color: #e16035;
 }
 button,

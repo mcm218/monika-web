@@ -19,7 +19,7 @@
     <div class="row row-cols-1">
       <button (click)="toggleFavorite(song)">
         <div *ngIf="isFavorite(song.id); else elseBlock">
-          <fa-icon [icon]="faSolidHeart"></fa-icon>
+          <fa-icon class="active" [icon]="faSolidHeart"></fa-icon>
         </div>
         <ng-template #elseBlock>
           <fa-icon [icon]="faHeart"></fa-icon>

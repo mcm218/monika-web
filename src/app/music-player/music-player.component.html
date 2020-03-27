@@ -1,7 +1,9 @@
-<div *ngIf="song" class="card">
+<div *ngIf="song" style="height: 100%" class="card">
   <div class="cover">
-    <img [src]="song.thumbnail" class="card-img-top" />
-    <div id="block"></div>
+    <iframe [src]="embedLink" frameborder="0"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <!-- <img [src]="song.thumbnail" class="card-img-top" /> -->
+    <!-- <div id="block"></div>
     <div id="title" class="d-block d-md-none">{{ song.title }}</div>
     <div id="artist" class="d-block d-md-none">{{ song.artist }}</div>
     <div id="favoriteButton" class="d-block d-md-none">
@@ -15,7 +17,7 @@
       </button>
     </div>
     <div id="titleLarge" class="d-none d-md-block">{{ song.title }}</div>
-    <div id="artistLarge" class="d-none d-md-block">{{ song.artist }}</div>
+    <div id="artistLarge" class="d-none d-md-block">{{ song.artist }}</div> -->
     <div id="favoriteButtonLarge" class="d-none d-md-block">
       <button (click)="toggleFavorite(song)">
         <div *ngIf="isFavorite(song.id); else favElseBlock">
@@ -26,12 +28,8 @@
         </ng-template>
       </button>
     </div>
-    <mat-progress-bar
-      id="scrollBar"
-      class="d-none d-md-block"
-      mode="determinate"
-      [value]="percentOfSong"
-    ></mat-progress-bar>
+    <!-- <mat-progress-bar id="scrollBar" class="d-none d-md-block" mode="determinate" [value]="percentOfSong">
+    </mat-progress-bar> -->
     <div id="controls" class="justify-content-center d-md-none">
       <!-- Shuffle -->
       <button class="col-2" (click)="shuffle()">
@@ -59,14 +57,11 @@
         <ng-container *ngIf="controller.loop == 0; else loopElseIfBlock">
           <fa-icon [icon]="faRedo" size="2x"></fa-icon>
         </ng-container>
-        <ng-template #loopElseIfBlock
-          ><ng-container *ngIf="controller.loop == 1; else loopElseBlock">
-            <fa-icon
-              [icon]="faRedo"
-              size="2x"
-              class="active"
-            ></fa-icon> </ng-container
-        ></ng-template>
+        <ng-template #loopElseIfBlock>
+          <ng-container *ngIf="controller.loop == 1; else loopElseBlock">
+            <fa-icon [icon]="faRedo" size="2x" class="active"></fa-icon>
+          </ng-container>
+        </ng-template>
         <ng-template #loopElseBlock>
           <fa-icon [icon]="faRedo" size="2x" class="active"></fa-icon>
         </ng-template>

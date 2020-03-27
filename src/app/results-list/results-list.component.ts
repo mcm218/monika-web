@@ -18,7 +18,7 @@ export class ResultsListComponent implements OnInit {
   ngOnInit() {}
 
   addToQueue(result: Song) {
-    this.toastr.show(result.title + " was added to the queue!", "");
+    this.toastr.show(this.db.fixStringFormatting(result.title) + " was added to the queue!", "");
     this.db.addToQueue(result);
   }
 

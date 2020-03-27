@@ -37,7 +37,7 @@ export class ListComponent implements OnInit {
   }
 
   addToQueue(song: Song) {
-    this.toastr.show(song.title + " was added to the queue!", "");
+    this.toastr.show(this.db.fixStringFormatting(song.title) + " was added to the queue!", "");
     this.db.addToQueue(song);
   }
 }
