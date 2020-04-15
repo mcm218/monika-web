@@ -131,5 +131,8 @@
       }
     }
   },
-  "defaultProject": "monika"
+  "defaultProject": "monika",
+  "cli": {
+    "analytics": false
+  }
 }
