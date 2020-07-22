@@ -16,10 +16,11 @@ export class MobileAuthComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
+      console.log("Opening app");
       const code: string = params["code"];
-      if (code) {
+      // if (code) {
         window.open("MonikaXamarin://?code=" + code, "_self");
-      }
+      // }
     });
   }
 

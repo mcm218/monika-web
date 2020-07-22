@@ -5,8 +5,9 @@ import { DesktopAuthComponent } from './desktop-auth/desktop-auth.component';
 import { MobileAuthComponent } from './mobile-auth/mobile-auth/mobile-auth.component';
 
 const routes: Routes = [
-  { path: "", component: HomeComponent }, { path: "auth", component: DesktopAuthComponent },
-  { path: "/mobile/auth", component: MobileAuthComponent }
+  { path: "", component: HomeComponent },
+  { path: "auth", component: DesktopAuthComponent },
+  { path: "mobile/auth", component: MobileAuthComponent }
 ];
 
 @NgModule({
