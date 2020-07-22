@@ -21,9 +21,14 @@ export class ListComponent implements OnInit {
   faTimes = faTimes;
   faSolidHeart = faSolidHeart;
 
-  constructor(private db: DbService, private toastr: ToastrService) {}
+  constructor(private db: DbService, private toastr: ToastrService) {
+  }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if(this.playlist && this.playlist.songs){
+      this.playlist.songs.reverse();
+    }
+  }
 
   deselectList() {
     this.db.deselectList();

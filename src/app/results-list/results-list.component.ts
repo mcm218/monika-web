@@ -11,6 +11,7 @@ import { ToastrService } from "ngx-toastr";
 export class ResultsListComponent implements OnInit {
   faTimes = faTimes;
   results: any[];
+  
   constructor(private db: DbService, private toastr: ToastrService) {
     this.db.results.subscribe(results => (this.results = results));
   }

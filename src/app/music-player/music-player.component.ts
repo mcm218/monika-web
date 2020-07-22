@@ -39,19 +39,10 @@ export class MusicPlayerComponent implements OnChanges {
   startTimer() { }
 
   ngOnChanges() {
-    if (this.song) {
-      if (this.curSong !== this.song.url) {
-        this.curSong = this.song.url;
-        console.log("NEW SONG");
-        this.embedLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.song.url.replace("watch?v=", "embed/") + "?autoplay=1&enablejsapi=1");
-      }
-      console.log(this.embedLink);
-    } else {
-      this.embedLink = null;
-    }
     if (
       this.controller &&
       this.controller.startTime &&
+      this.controller.startTime != -1 &&
       this.controller.duration
     ) {
       const now = Date.now();
@@ -66,13 +57,25 @@ export class MusicPlayerComponent implements OnChanges {
       } else {
         this.curTime = now - this.controller.startTime;
       }
+      // console.log("Starting song at: " + this.curTime / 1000);
+      if (this.song) {
+        if (this.curSong !== this.song.url) {
+          this.curSong = this.song.url;
+          var startTime = Math.ceil(this.curTime / 1000);
+          console.log("NEW SONG");
+          this.embedLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.song.url.replace("watch?v=", "embed/") + "?autoplay=1&mute=1&enablejsapi=1&start=" + startTime);
+        }
+        // console.log(this.embedLink);
+      } else {
+        this.embedLink = null;
+      }
       this.percentOfSong =
         (this.curTime / 1000 / this.controller.duration) * 100;
       // get how many percent the bar moves in a tickDurationMS
       // divide by tickDurationMS -> convert to 100MS units
       // divide by 100 -> get MS per percent
       this.interval = 100 / this.controller.duration / 10;
-      console.log(this.interval);
+      // console.log(this.interval);
       if (this.timerSub) {
         this.timerSub.unsubscribe();
       }

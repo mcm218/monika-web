@@ -1,9 +1,9 @@
 .thumbnail {
-  max-height: 40px;
-  max-width: 40px;
+  max-height: 150px;
+  max-width: 200px;
 }
 .card {
-  max-width: 800px;
+  /* max-width: 800px; */
   text-align: start;
   margin: 20px auto;
   padding: 10px 5px;
@@ -53,4 +53,7 @@ hr {
 
 .list-group::-webkit-scrollbar-thumb {
   background-color: #353535;
+}
+.buffer{
+  height: 500px;
 }

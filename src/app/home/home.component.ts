@@ -47,8 +47,9 @@ export class HomeComponent implements OnInit {
       this.authenticated = guildVerified;
       if (guildVerified) {
         this.auth.servers.subscribe(servers => (this.servers = servers));
-        this.auth.selectedServer.subscribe(server => {
+        AuthService.selectedServer.subscribe(server => {
           this.selectedServer = server;
+          this.db.getMusicPlayerData();
         });
         this.db.queue.subscribe(queue => (this.queue = queue));
         this.db.onlineUsers.subscribe(users => (this.onlineUsers = users));

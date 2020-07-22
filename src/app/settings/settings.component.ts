@@ -56,6 +56,7 @@ export class SettingsComponent implements OnInit {
         "&scope=https%3A//www.googleapis.com/auth/youtube.readonly";
       this.youtubeUrl = youtubeRequestPath;
     } else {
+      console.log(url);
       // Running from web
       var spotifyRequestPath = (this.spotifyPath +=
         "?client_id=" + environment.spotifyData.client_id);

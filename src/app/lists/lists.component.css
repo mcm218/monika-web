@@ -26,3 +26,7 @@
 .list-group::-webkit-scrollbar-thumb {
   background-color: #353535;
 }
+.thumbnail {
+  max-height: 200px;
+  max-width: 200px;
+}

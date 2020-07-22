@@ -15,6 +15,6 @@ export class QueueComponent implements OnInit {
 
   drop(event: CdkDragDrop<Song[]>): void {
     moveItemInArray(this.queue, event.previousIndex, event.currentIndex);
-    this.db.updateQueue(this.queue);
+    this.db.changeSongPosition(this.queue, event.currentIndex);
   }
 }

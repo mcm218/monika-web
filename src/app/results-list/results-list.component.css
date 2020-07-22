@@ -1,6 +1,9 @@
 .thumbnail {
-  max-height: 60px;
-  max-width: 60px;
+  max-height: 200px;
+  max-width: 200px;
+}
+.title{
+  font-size: 20px;
 }
 .card {
   max-width: 800px;
