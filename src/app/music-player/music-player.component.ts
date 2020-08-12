@@ -63,7 +63,7 @@ export class MusicPlayerComponent implements OnChanges {
           this.curSong = this.song.url;
           var startTime = Math.ceil(this.curTime / 1000);
           console.log("NEW SONG");
-          this.embedLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.song.url.replace("watch?v=", "embed/") + "?autoplay=1&mute=1&enablejsapi=1&start=" + startTime);
+          this.embedLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.song.url.replace("watch?v=", "embed/") + "?autoplay=1&mute=1&enablejsapi=1");
         }
         // console.log(this.embedLink);
       } else {

@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Subscription } from "rxjs";
+import { BehaviorSubject, Subscription, Observable } from "rxjs";
+import { webSocket, WebSocketSubject } from "rxjs/webSocket";
 import { environment } from "src/environments/environment";
 import { AuthService } from "./auth.service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
@@ -73,7 +74,10 @@ export class DbService {
   spotifyPath = "https://api.spotify.com/v1/me/";
   spotifyAlbumPath = "https://api.spotify.com/v1/albums/";
 
-  ApiPath = "https://rulwogx4wf.execute-api.us-east-2.amazonaws.com/Development/api";
+  ApiPath =
+    "https://rulwogx4wf.execute-api.us-east-2.amazonaws.com/Development/api";
+  WebSocketPath = "ws://localhost:3000";
+
   // ApiPath = "http://localhost:3000/api";
   // ApiPath = "http://66.42.90.210:3000/api"
 
@@ -89,11 +93,11 @@ export class DbService {
   controller = new BehaviorSubject<MusicController>(undefined);
   onlineUsers = new BehaviorSubject<any[]>([]);
 
+  guildQueueSocket: WebSocketSubject<any>;
+
   userHistory = new BehaviorSubject<Song[]>([]);
   userMostAdded = new BehaviorSubject<Song[]>([]);
-  userFavorites = new BehaviorSubject<Map<string, Song>>(
-    new Map<string, Song>()
-  );
+  userFavorites = new BehaviorSubject<Song[]>([]);
   otherLists = [];
 
   results = new BehaviorSubject<any[]>([]);
@@ -145,18 +149,50 @@ export class DbService {
         this.controller.next(data);
       });
 
-    // Queue
+    console.log("Connecting to websocket...");
+
+    if (this.guildQueueSocket == null) {
+      this.guildQueueSocket = webSocket(this.WebSocketPath);
+
+      this.guildQueueSocket.asObservable().subscribe((data) => {
+        if (data.queue != null) {
+          const dbQueue = [];
+          data.queue.forEach((song) => {
+            song.title = this.fixStringFormatting(song.title);
+            song.youtubeTitle = this.fixStringFormatting(song.youtubeTitle);
+            dbQueue.push(song);
+            console.log(song);
+          });
+
+          dbQueue.sort((a, b) => a.pos - b.pos);
+          const currentSong = dbQueue.splice(0, 1)[0];
+          this.currentSong.next(currentSong);
+          this.queue.next(dbQueue);
+        } else {
+          console.log(data);
+        }
+      });
+
+      let servers: Array<string> = [];
+
+      this.auth.servers.getValue().forEach((server) => {
+        servers.push(server.id);
+      });
+      console.log(servers);
+      this.guildQueueSocket.next({ guilds: servers });
+    }
+
     this.queueSub = ref
       .doc("queue")
       .collection("songs")
-      .snapshotChanges()
-      .subscribe((snapshots) => {
+      .get()
+      .subscribe((docs) => {
         // each song needs to be a field (unsorted)
         // each song needs to contain its position
         // sort after reading doc
         const dbQueue = [];
-        snapshots.forEach((snapshot) => {
-          const data = snapshot.payload.doc.data();
+        docs.forEach((doc) => {
+          const data = doc.data();
           data.title = this.fixStringFormatting(data.title);
           data.youtubeTitle = this.fixStringFormatting(data.youtubeTitle);
           dbQueue.push(data);
@@ -166,12 +202,13 @@ export class DbService {
         this.currentSong.next(currentSong);
         this.queue.next(dbQueue);
       });
+
     // History
     this.historySub = ref
       .doc("history")
       .snapshotChanges()
       .subscribe((snapshot) => {
-        const data = snapshot.payload.data() as { history: [] };
+        const data = snapshot.payload.data() as { history: Array<any> };
         if (snapshot.payload.exists) {
           this.history.next(data.history);
         }
@@ -404,11 +441,13 @@ export class DbService {
     // batch.commit();
   }
 
-  changeSongPosition(songs: Song[], newIndex: number){
+  changeSongPosition(songs: Song[], newIndex: number) {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/song/${songs[newIndex].uid}/${newIndex + 1}`;
+    const path = `${this.ApiPath}/guilds/${
+      AuthService.selectedServer.value.id
+    }/queue/song/${songs[newIndex].uid}/${newIndex + 1}`;
     const request = this.http.patch(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -507,12 +546,13 @@ export class DbService {
       "Content-Type": "application/json",
     });
     const path = `${this.ApiPath}/users/${uid}/histories`;
-    const request = this.http.get<Song[]>(path, { headers: header });
+    const request = this.http.get<any[]>(path, { headers: header });
     request.subscribe(
       (response) => {
         console.log(response);
+        response.sort((a, b) => b.dateAdded - a.dateAdded);
         this.userHistory.next(response);
-        this.updateLists
+        this.updateLists;
       },
       (error) => console.error(error)
     );
@@ -553,19 +593,20 @@ export class DbService {
   // Grabs user favorites
   getUserFavorites(): void {
     const uid = this.auth.user.value.id;
-    const ref = this.firestore.collection(
-      "users/" + uid + "/favorites",
-      (ref) => ref.orderBy("date", "desc").limit(50)
-    );
-    ref.snapshotChanges().subscribe((snapshots) => {
-      const favorites = new Map<string, Song>();
-      snapshots.forEach((snapshot) => {
-        const data = snapshot.payload.doc.data() as Song;
-        favorites.set(data.id, data);
-      });
-      this.userFavorites.next(favorites);
-      this.updateLists();
+    const header = new HttpHeaders({
+      "Content-Type": "application/json",
     });
+    const path = `${this.ApiPath}/users/${uid}/histories/mostadded`;
+    const request = this.http.get<Song[]>(path, { headers: header });
+    request.subscribe(
+      (response) => {
+        console.log(response);
+        this.userFavorites.next(response);
+        this.updateLists();
+      },
+      (error) => console.error(error)
+    );
+    return;
   }
 
   cacheSearch(query: string, results: any, isVideo: boolean): void {
@@ -718,10 +759,13 @@ export class DbService {
             .collection("users/" + uid + "/favorites")
             .doc(song.id);
           if (this.isFavorite(song.id)) {
-            this.userFavorites.value.delete(song.id);
+            const index = this.userFavorites
+              .getValue()
+              .findIndex((a) => song.id == a.id);
+            this.userFavorites.getValue().splice(index, 1);
             ref.delete();
           } else {
-            this.userFavorites.value.set(song.id, song);
+            this.userFavorites.getValue().push(song);
             ref.set({ ...song, date });
           }
         } else {
@@ -744,11 +788,15 @@ export class DbService {
                 const ref = this.firestore
                   .collection("users/" + uid + "/favorites")
                   .doc(song.id);
+
                 if (this.isFavorite(song.id)) {
-                  this.userFavorites.value.delete(song.id);
+                  const index = this.userFavorites
+                    .getValue()
+                    .findIndex((a) => song.id == a.id);
+                  this.userFavorites.getValue().splice(index, 1);
                   ref.delete();
                 } else {
-                  this.userFavorites.value.set(song.id, song);
+                  this.userFavorites.getValue().push(song);
                   ref.set({ ...song, date });
                 }
               },
@@ -1259,27 +1307,29 @@ export class DbService {
 
   // Checks Favorite list to see if song is favorited
   isFavorite(id: string): boolean {
-    return this.userFavorites.value.get(id) ? true : false;
+    return this.userFavorites.getValue().find((a) => id == a.id) ? true : false;
   }
 
   // Toggles favorite status for song
   toggleFavorite(song: Song): void {
     const favorites = this.userFavorites.value;
-    const isFavorite = favorites.get(song.id) ? true : false;
+    const isFavorite = favorites.find((a) => song.id == a.id) ? true : false;
     console.log(isFavorite);
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/users/${this.auth.user.value.uid}/favorites/songs/${song.id}`;
+    const path = `${this.ApiPath}/users/${
+      this.auth.user.getValue().id
+    }/favorites/songs/${song.id}`;
     let request;
-    if (isFavorite){
+    if (isFavorite) {
       request = this.http.delete(path, { headers: header });
-      favorites.delete(song.id);
+      const index = favorites.findIndex((a) => song.id == a.id);
+      favorites.splice(index, 1);
+    } else {
+      request = this.http.post(path, { song: song }, { headers: header });
+      favorites.push(song);
     }
-    else{
-      request = this.http.post(path, {song: song }, { headers: header });
-      favorites.set(song.id, song);
-    } 
 
     request.subscribe(
       (response) => {

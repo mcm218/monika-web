@@ -20,14 +20,14 @@
         <fa-icon [icon]="faBackward" size="lg"></fa-icon>
       </button>
       <!-- Pause/Play -->
-      <button class="col-2" (click)="togglePlay()">
+      <!-- <button class="col-2" (click)="togglePlay()">
         <div *ngIf="!controller.pauseState; else elseBlock">
           <fa-icon [icon]="faPause" size="lg"></fa-icon>
         </div>
         <ng-template #elseBlock>
           <fa-icon [icon]="faPlay" size="lg"></fa-icon>
         </ng-template>
-      </button>
+      </button> -->
       <!-- Skip -->
       <button class="col-1 d-none d-md-block" (click)="nextSong()">
         <fa-icon [icon]="faForward" size="lg"></fa-icon>
@@ -80,7 +80,7 @@
   my-auto"
     *ngIf="controller"
   >
-    <input
+    <!-- <input
       type="range"
       min="0"
       max="20"
@@ -88,6 +88,6 @@
       [value]="controller.volume"
       class="slider"
       id="myRange"
-    />
+    /> -->
   </div>
 </div>
