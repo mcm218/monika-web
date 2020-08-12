@@ -20,8 +20,9 @@ export class AuthService {
 
   discordPath = "https://discordapp.com/api/";
 
+  ApiPath = "https://rulwogx4wf.execute-api.us-east-2.amazonaws.com/Development/";
   // ApiPath = "http://localhost:3000/";
-  ApiPath = "http://66.42.90.210:3000/"
+  // ApiPath = "http://66.42.90.210:3000/"
 
   DiscordAuthPath = this.ApiPath + "api/auth/discord";
   SpotifyAuthPath = this.ApiPath + "api/auth/spotify";
@@ -135,7 +136,7 @@ export class AuthService {
     console.log("Authorizing Discord");
     // Local Server
     let response = this.http.post(
-      this.DiscordAuthPath,
+      this.DiscordAuthPath + `/${code}`,
       { code: code, uri: url, id: localStorage.getItem("id") },
       {
         headers: new HttpHeaders({
@@ -351,7 +352,7 @@ export class AuthService {
     }
     // Local Server
     let response = this.http.post(
-      this.SpotifyAuthPath,
+      this.SpotifyAuthPath + `/${code}`,
       { code: code, uri: url, id: localStorage.getItem("id") },
       {
         headers: new HttpHeaders({

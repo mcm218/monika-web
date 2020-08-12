@@ -73,8 +73,9 @@ export class DbService {
   spotifyPath = "https://api.spotify.com/v1/me/";
   spotifyAlbumPath = "https://api.spotify.com/v1/albums/";
 
+  ApiPath = "https://rulwogx4wf.execute-api.us-east-2.amazonaws.com/Development/api";
   // ApiPath = "http://localhost:3000/api";
-  ApiPath = "http://66.42.90.210:3000/api"
+  // ApiPath = "http://66.42.90.210:3000/api"
 
   // localSongPath = 'http://localhost:3000/api';
 
@@ -112,7 +113,7 @@ export class DbService {
 
   // Firestore
   getMusicPlayerData(): void {
-    const apiPath = `${this.ApiPath}/${AuthService.selectedServer.value.id}/player`;
+    const apiPath = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/player`;
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -192,7 +193,7 @@ export class DbService {
   async updateController(controller: MusicController) {
     controller.shuffleMode = false;
 
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/player`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/player`;
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -253,7 +254,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/queue/song`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/song`;
     const request = this.http.post<Song>(path, song, { headers: header });
     request.subscribe(
       (response) => {
@@ -278,7 +279,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/queue/song/${song.uid}`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/song/${song.uid}`;
     const request = this.http.delete<Song>(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -296,11 +297,12 @@ export class DbService {
     this.history.next(songs);
     this.firestore.collection(path).doc("history").set({ history: songs });
   }
+
   skipCurrent() {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/queue/song`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/song`;
     const request = this.http.delete<Song>(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -356,7 +358,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/queue/song`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/song`;
     const request = this.http.put(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -406,7 +408,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/queue/song/${songs[newIndex].uid}/${newIndex + 1}`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/song/${songs[newIndex].uid}/${newIndex + 1}`;
     const request = this.http.patch(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -431,7 +433,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/queue/shuffle`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/shuffle`;
     const request = this.http.put(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -504,7 +506,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/user/${uid}/history`;
+    const path = `${this.ApiPath}/users/${uid}/histories`;
     const request = this.http.get<Song[]>(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -535,7 +537,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/user/${uid}/history`;
+    const path = `${this.ApiPath}/users/${uid}/histories/mostadded`;
     const request = this.http.get<Song[]>(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -916,7 +918,7 @@ export class DbService {
   }
   searchYoutube(query: string): void {
     const q = query.trim().split(" ").join("+");
-    const path = `${this.ApiPath}/search/youtube/${q}`;
+    const path = `${this.ApiPath}/search/youtube/song/${q}`;
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -1005,7 +1007,7 @@ export class DbService {
 
   searchYoutubePlaylist(query: string): void {
     const q = query.trim().split(" ").join("+");
-    const path = `${this.ApiPath}/search/album/youtube/${q}`;
+    const path = `${this.ApiPath}/search/youtube/album/${q}`;
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -1088,7 +1090,7 @@ export class DbService {
   }
 
   addYoutubePlaylist(playlist: Song): void {
-    const path = `${this.ApiPath}/${AuthService.selectedServer.value.id}/queue/album/youtube`;
+    const path = `${this.ApiPath}/guilds/${AuthService.selectedServer.value.id}/queue/album/youtube`;
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -1268,7 +1270,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/${this.auth.user.value.uid}/song/favorite/${song.id}`;
+    const path = `${this.ApiPath}/users/${this.auth.user.value.uid}/favorites/songs/${song.id}`;
     let request;
     if (isFavorite){
       request = this.http.delete(path, { headers: header });

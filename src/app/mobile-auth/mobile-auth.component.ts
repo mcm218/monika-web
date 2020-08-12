@@ -19,7 +19,7 @@ export class MobileAuthComponent implements OnInit {
       console.log("Opening app");
       const code: string = params["code"];
       // if (code) {
-        window.open("MonikaXamarin://?code=" + code, "_self");
+        window.open("MonikaXamarin://");
       // }
     });
   }
