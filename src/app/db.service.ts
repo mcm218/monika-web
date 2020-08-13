@@ -76,7 +76,7 @@ export class DbService {
 
   ApiPath =
     "https://rulwogx4wf.execute-api.us-east-2.amazonaws.com/Development/api";
-  WebSocketPath = "ws://localhost:3000";
+  WebSocketPath = "ws://136.57.218.5:3000";
 
   // ApiPath = "http://localhost:3000/api";
   // ApiPath = "http://66.42.90.210:3000/api"
@@ -596,7 +596,7 @@ export class DbService {
     const header = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    const path = `${this.ApiPath}/users/${uid}/histories/mostadded`;
+    const path = `${this.ApiPath}/users/${uid}/favorites`;
     const request = this.http.get<Song[]>(path, { headers: header });
     request.subscribe(
       (response) => {
@@ -1312,7 +1312,7 @@ export class DbService {
 
   // Toggles favorite status for song
   toggleFavorite(song: Song): void {
-    const favorites = this.userFavorites.value;
+    const favorites = this.userFavorites.getValue();
     const isFavorite = favorites.find((a) => song.id == a.id) ? true : false;
     console.log(isFavorite);
     const header = new HttpHeaders({

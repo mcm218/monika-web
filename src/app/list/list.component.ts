@@ -27,6 +27,7 @@ export class ListComponent implements OnInit {
   ngOnInit() {
     if(this.playlist && this.playlist.songs){
       this.playlist.songs.reverse();
+      console.log(this.playlist.songs.length);
     }
   }
 

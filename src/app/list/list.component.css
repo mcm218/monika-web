@@ -37,11 +37,11 @@ hr {
   outline: none;
 }
 
-/* .list-group {
+.list-group {
   height: calc(100vh - 200px);
   overflow: hidden;
   overflow-y: scroll;
-} */
+}
 
 .list-group::-webkit-scrollbar {
   width: 1em;
