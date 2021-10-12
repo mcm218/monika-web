@@ -3,7 +3,7 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { faYoutube, faSpotify } from "@fortawesome/free-brands-svg-icons";
 import { environment } from "src/environments/environment";
 import { DbService } from "../db.service";
-import { IpcRenderer } from 'electron';
+// import { IpcRenderer } from 'electron';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class SettingsComponent implements OnInit {
   faSpotify = faSpotify;
   faTimes = faTimes;
 
-  private ipc: IpcRenderer
+  // private ipc: IpcRenderer
   private id: number;
 
   spotifyPath = "https://accounts.spotify.com/authorize";
@@ -25,12 +25,12 @@ export class SettingsComponent implements OnInit {
   youtubeUrl: string;
   constructor(private db: DbService, private auth: AuthService) {
     if ((<any>window).require) {
-      console.log("Setting up IPC...");
-      try {
-        this.ipc = (<any>window).require('electron').ipcRenderer;
-      } catch (e) {
-        throw e;
-      }
+      // console.log("Setting up IPC...");
+      // try {
+      //   this.ipc = (<any>window).require('electron').ipcRenderer;
+      // } catch (e) {
+      //   throw e;
+      // }
     } else {
       console.log('App not running inside Electron!');
     }
@@ -79,22 +79,22 @@ export class SettingsComponent implements OnInit {
   ngOnInit() { }
 
   authSpotify() {
-    if (this.ipc) {
-      console.log("Opening new window");
-      this.auth.desktopAuthorize(this.id.toString(), "spotify");
-      this.ipc.send("openAuthWindow", this.spotifyUrl);
-    } else {
-      window.open(this.spotifyUrl, "_self");
-    }
+    // if (this.ipc) {
+    //   console.log("Opening new window");
+    //   this.auth.desktopAuthorize(this.id.toString(), "spotify");
+    //   this.ipc.send("openAuthWindow", this.spotifyUrl);
+    // } else {
+    //   window.open(this.spotifyUrl, "_self");
+    // }
   }
 
   authYoutube() {
-    if (this.ipc) {
-      this.auth.desktopAuthorize(this.id.toString(), "youtube");
-      this.ipc.send("openAuthWindow", this.youtubeUrl);
-    } else {
-      window.open(this.youtubeUrl, "_self");
-    }
+    // if (this.ipc) {
+    //   this.auth.desktopAuthorize(this.id.toString(), "youtube");
+    //   this.ipc.send("openAuthWindow", this.youtubeUrl);
+    // } else {
+    //   window.open(this.youtubeUrl, "_self");
+    // }
   }
 
   back() {

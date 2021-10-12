@@ -5,10 +5,6 @@ import { HttpClientModule } from "@angular/common/http";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { AngularFireModule } from "@angular/fire";
-import { AngularFirestoreModule } from "@angular/fire/firestore";
-import { AngularFireAuthModule } from "@angular/fire/auth";
-import { AngularFireFunctionsModule } from "@angular/fire/functions"
 import { CookieService } from "ngx-cookie-service";
 import { ToastrModule } from "ngx-toastr";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
@@ -51,10 +47,6 @@ import { DesktopAuthComponent } from './desktop-auth/desktop-auth.component';
     ReactiveFormsModule,
     FontAwesomeModule,
     HttpClientModule,
-    AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFirestoreModule,
-    AngularFireAuthModule,
-    AngularFireFunctionsModule,
     DragDropModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({

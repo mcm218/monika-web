@@ -4,7 +4,7 @@ import { webSocket, WebSocketSubject } from "rxjs/webSocket";
 import { environment } from "src/environments/environment";
 import { AuthService } from "./auth.service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { AngularFirestore } from "@angular/fire/firestore";
+// import { AngularFirestore } from "@angular/fire/firestore";
 import { SongComponent } from "./song/song.component";
 import { v4 as uuid } from "uuid";
 
@@ -110,7 +110,7 @@ export class DbService {
   usersSub: Subscription;
 
   constructor(
-    private firestore: AngularFirestore,
+    // private firestore: AngularFirestore,
     private auth: AuthService,
     private http: HttpClient
   ) {}
@@ -134,20 +134,20 @@ export class DbService {
     );
     // Controller
     const path = "guilds/" + AuthService.selectedServer.value.id + "/VC";
-    const ref = this.firestore.collection(path);
+    // const ref = this.firestore.collection(path);
     if (this.controlSub || this.queueSub || this.historySub || this.usersSub) {
       this.controlSub.unsubscribe();
       this.queueSub.unsubscribe();
       this.historySub.unsubscribe();
       this.usersSub.unsubscribe();
     }
-    this.controlSub = ref
-      .doc("controller")
-      .snapshotChanges()
-      .subscribe((snapshot) => {
-        const data = snapshot.payload.data() as MusicController;
-        this.controller.next(data);
-      });
+    // this.controlSub = ref
+    //   .doc("controller")
+    //   .snapshotChanges()
+    //   .subscribe((snapshot) => {
+    //     const data = snapshot.payload.data() as MusicController;
+    //     this.controller.next(data);
+    //   });
 
     console.log("Connecting to websocket...");
 
@@ -182,49 +182,49 @@ export class DbService {
       this.guildQueueSocket.next({ guilds: servers });
     }
 
-    this.queueSub = ref
-      .doc("queue")
-      .collection("songs")
-      .get()
-      .subscribe((docs) => {
-        // each song needs to be a field (unsorted)
-        // each song needs to contain its position
-        // sort after reading doc
-        const dbQueue = [];
-        docs.forEach((doc) => {
-          const data = doc.data();
-          data.title = this.fixStringFormatting(data.title);
-          data.youtubeTitle = this.fixStringFormatting(data.youtubeTitle);
-          dbQueue.push(data);
-        });
-        dbQueue.sort((a, b) => a.pos - b.pos);
-        const currentSong = dbQueue.splice(0, 1)[0];
-        this.currentSong.next(currentSong);
-        this.queue.next(dbQueue);
-      });
+    // this.queueSub = ref
+    //   .doc("queue")
+    //   .collection("songs")
+    //   .get()
+    //   .subscribe((docs) => {
+    //     // each song needs to be a field (unsorted)
+    //     // each song needs to contain its position
+    //     // sort after reading doc
+    //     const dbQueue = [];
+    //     docs.forEach((doc) => {
+    //       const data = doc.data();
+    //       data.title = this.fixStringFormatting(data.title);
+    //       data.youtubeTitle = this.fixStringFormatting(data.youtubeTitle);
+    //       dbQueue.push(data);
+    //     });
+    //     dbQueue.sort((a, b) => a.pos - b.pos);
+    //     const currentSong = dbQueue.splice(0, 1)[0];
+    //     this.currentSong.next(currentSong);
+    //     this.queue.next(dbQueue);
+    //   });
 
-    // History
-    this.historySub = ref
-      .doc("history")
-      .snapshotChanges()
-      .subscribe((snapshot) => {
-        const data = snapshot.payload.data() as { history: Array<any> };
-        if (snapshot.payload.exists) {
-          this.history.next(data.history);
-        }
-      });
-    // Online Users
-    this.usersSub = ref.snapshotChanges().subscribe((snapshots) => {
-      const onlineUsers = [];
-      snapshots.forEach((snapshot) => {
-        const user = snapshot.payload.doc.data() as any;
-        if (user.id && user.username) {
-          // Valid User, add to list
-          onlineUsers.push(user);
-        }
-      });
-      this.onlineUsers.next(onlineUsers);
-    });
+    // // History
+    // this.historySub = ref
+    //   .doc("history")
+    //   .snapshotChanges()
+    //   .subscribe((snapshot) => {
+    //     const data = snapshot.payload.data() as { history: Array<any> };
+    //     if (snapshot.payload.exists) {
+    //       this.history.next(data.history);
+    //     }
+    //   });
+    // // Online Users
+    // this.usersSub = ref.snapshotChanges().subscribe((snapshots) => {
+    //   const onlineUsers = [];
+    //   snapshots.forEach((snapshot) => {
+    //     const user = snapshot.payload.doc.data() as any;
+    //     if (user.id && user.username) {
+    //       // Valid User, add to list
+    //       onlineUsers.push(user);
+    //     }
+    //   });
+    //   this.onlineUsers.next(onlineUsers);
+    // });
   }
 
   async updateController(controller: MusicController) {
@@ -332,7 +332,7 @@ export class DbService {
       songs.pop();
     }
     this.history.next(songs);
-    this.firestore.collection(path).doc("history").set({ history: songs });
+    // this.firestore.collection(path).doc("history").set({ history: songs });
   }
 
   skipCurrent() {
@@ -460,13 +460,13 @@ export class DbService {
 
   resetTime() {
     const path = "guilds/" + AuthService.selectedServer.value.id + "/VC/";
-    this.firestore
-      .collection(path)
-      .doc("controller")
-      .set(
-        { startTime: -1, duration: -1, pauseTime: -1, resumeTime: -1 },
-        { merge: true }
-      );
+    // this.firestore
+    //   .collection(path)
+    //   .doc("controller")
+    //   .set(
+    //     { startTime: -1, duration: -1, pauseTime: -1, resumeTime: -1 },
+    //     { merge: true }
+    //   );
   }
   shuffle() {
     const header = new HttpHeaders({
@@ -501,19 +501,19 @@ export class DbService {
     const path =
       "guilds/" + AuthService.selectedServer.value.id + "/VC/queue/songs";
     let i = 0;
-    const batch = this.firestore.firestore.batch();
-    queue.forEach((song) => {
-      song.title = this.fixStringFormatting(song.title);
-      if (song.youtubeTitle) {
-        song.youtubeTitle = this.fixStringFormatting(song.youtubeTitle);
-      }
-      song.pos = i;
-      song.uid =
-        song.uid && song.uid != "" ? song.uid : song.id + Date.now().toString();
-      this.firestore.collection(path).doc(song.uid).set(song);
-      i++;
-    });
-    batch.commit();
+    // const batch = this.firestore.firestore.batch();
+    // queue.forEach((song) => {
+    //   song.title = this.fixStringFormatting(song.title);
+    //   if (song.youtubeTitle) {
+    //     song.youtubeTitle = this.fixStringFormatting(song.youtubeTitle);
+    //   }
+    //   song.pos = i;
+    //   song.uid =
+    //     song.uid && song.uid != "" ? song.uid : song.id + Date.now().toString();
+    //   this.firestore.collection(path).doc(song.uid).set(song);
+    //   i++;
+    // });
+    // batch.commit();
   }
 
   // Push song to user history, update dateAdded/timesAdded as necessary
@@ -558,18 +558,18 @@ export class DbService {
     );
     return;
 
-    const ref = this.firestore.collection("users/" + uid + "/history", (ref) =>
-      ref.orderBy("dateAdded", "desc").limit(50)
-    );
-    ref.snapshotChanges().subscribe((snapshots) => {
-      const history: Song[] = [];
-      snapshots.forEach((snapshot) => {
-        const data = snapshot.payload.doc.data() as DbSong;
-        history.push(data.song);
-      });
-      this.userHistory.next(history);
-      this.updateLists();
-    });
+    // const ref = this.firestore.collection("users/" + uid + "/history", (ref) =>
+    //   ref.orderBy("dateAdded", "desc").limit(50)
+    // );
+    // ref.snapshotChanges().subscribe((snapshots) => {
+    //   const history: Song[] = [];
+    //   snapshots.forEach((snapshot) => {
+    //     const data = snapshot.payload.doc.data() as DbSong;
+    //     history.push(data.song);
+    //   });
+    //   this.userHistory.next(history);
+    //   this.updateLists();
+    // });
   }
   // Grabs user history, sorted by times added
   getUserMostAdded(): void {
@@ -610,17 +610,17 @@ export class DbService {
   }
 
   cacheSearch(query: string, results: any, isVideo: boolean): void {
-    let ref;
-    if (isVideo) {
-      ref = this.firestore
-        .collection("searches/videos/" + query)
-        .doc("results");
-    } else {
-      ref = this.firestore
-        .collection("searches/playlists/" + query)
-        .doc("results");
-    }
-    ref.set(results);
+    // let ref;
+    // if (isVideo) {
+    //   ref = this.firestore
+    //     .collection("searches/videos/" + query)
+    //     .doc("results");
+    // } else {
+    //   ref = this.firestore
+    //     .collection("searches/playlists/" + query)
+    //     .doc("results");
+    // }
+    // ref.set(results);
   }
 
   // Spotify
@@ -692,118 +692,118 @@ export class DbService {
   addSpotifySong(song: Song): void {
     const query = (song.title + "+" + song.artist).split(" ").join("+");
     console.log(query);
-    this.firestore
-      .collection("searches/videos/" + "spotify+" + query)
-      .doc("results")
-      .get()
-      .subscribe((snapshot) => {
-        if (snapshot.exists) {
-          const result = snapshot.data().items[0];
-          result.snippet.title = this.fixStringFormatting(result.snippet.title);
+    // this.firestore
+    //   .collection("searches/videos/" + "spotify+" + query)
+    //   .doc("results")
+    //   .get()
+    //   .subscribe((snapshot) => {
+    //     if (snapshot.exists) {
+    //       const result = snapshot.data().items[0];
+    //       result.snippet.title = this.fixStringFormatting(result.snippet.title);
 
-          // Turn into function?
-          song.id = result.id.videoId;
-          song.url = "https://www.youtube.com/watch?v=" + song.id;
-          song.youtubeTitle = result.snippet.title;
-          this.pushSong(song);
-          song.user = this.auth.user.value;
-          const queue = this.queue.value;
-          queue.push(song);
-          this.addSongToLocalServer(song);
-          this.updateQueue(queue);
-        } else {
-          this.http
-            .get(this.youtubeSearchPath + query + "+song" + "&type=video")
-            .subscribe(
-              (response) => {
-                const result = (response as any).items[0];
+    //       // Turn into function?
+    //       song.id = result.id.videoId;
+    //       song.url = "https://www.youtube.com/watch?v=" + song.id;
+    //       song.youtubeTitle = result.snippet.title;
+    //       this.pushSong(song);
+    //       song.user = this.auth.user.value;
+    //       const queue = this.queue.value;
+    //       queue.push(song);
+    //       this.addSongToLocalServer(song);
+    //       this.updateQueue(queue);
+    //     } else {
+    //       this.http
+    //         .get(this.youtubeSearchPath + query + "+song" + "&type=video")
+    //         .subscribe(
+    //           (response) => {
+    //             const result = (response as any).items[0];
 
-                result.snippet.title = this.fixStringFormatting(
-                  result.snippet.title
-                );
-                this.cacheSearch("spotify+" + query, response, true);
-                // Turn into function?
-                song.id = result.id.videoId;
-                song.url = "https://www.youtube.com/watch?v=" + song.id;
-                song.youtubeTitle = result.snippet.title;
-                this.pushSong(song);
-                song.user = this.auth.user.value;
-                const queue = this.queue.value;
-                queue.push(song);
-                this.addSongToLocalServer(song);
-                this.updateQueue(queue);
-              },
-              (error) => console.error(error)
-            );
-        }
-      });
+    //             result.snippet.title = this.fixStringFormatting(
+    //               result.snippet.title
+    //             );
+    //             this.cacheSearch("spotify+" + query, response, true);
+    //             // Turn into function?
+    //             song.id = result.id.videoId;
+    //             song.url = "https://www.youtube.com/watch?v=" + song.id;
+    //             song.youtubeTitle = result.snippet.title;
+    //             this.pushSong(song);
+    //             song.user = this.auth.user.value;
+    //             const queue = this.queue.value;
+    //             queue.push(song);
+    //             this.addSongToLocalServer(song);
+    //             this.updateQueue(queue);
+    //           },
+    //           (error) => console.error(error)
+    //         );
+    //     }
+    //   });
   }
   toggleSpotifyFavorite(song: Song): void {
     const query = (song.artist + " " + song.title).split(" ").join("+");
-    this.firestore
-      .collection("searches/videos/" + "spotify+" + query)
-      .doc("results")
-      .get()
-      .subscribe((snapshot) => {
-        if (snapshot.exists) {
-          const result = snapshot.data().items[0];
-          result.snippet.title = this.fixStringFormatting(result.snippet.title);
-          // Turn into function?
-          song.id = result.id.videoId;
-          song.url = "https://www.youtube.com/watch?v=" + song.id;
-          song.youtubeTitle = result.snippet.title;
+    // this.firestore
+    //   .collection("searches/videos/" + "spotify+" + query)
+    //   .doc("results")
+    //   .get()
+    //   .subscribe((snapshot) => {
+    //     if (snapshot.exists) {
+    //       const result = snapshot.data().items[0];
+    //       result.snippet.title = this.fixStringFormatting(result.snippet.title);
+    //       // Turn into function?
+    //       song.id = result.id.videoId;
+    //       song.url = "https://www.youtube.com/watch?v=" + song.id;
+    //       song.youtubeTitle = result.snippet.title;
 
-          const date = new Date();
-          const uid = this.auth.user.value.id;
-          const ref = this.firestore
-            .collection("users/" + uid + "/favorites")
-            .doc(song.id);
-          if (this.isFavorite(song.id)) {
-            const index = this.userFavorites
-              .getValue()
-              .findIndex((a) => song.id == a.id);
-            this.userFavorites.getValue().splice(index, 1);
-            ref.delete();
-          } else {
-            this.userFavorites.getValue().push(song);
-            ref.set({ ...song, date });
-          }
-        } else {
-          this.http
-            .get(this.youtubeSearchPath + query + "+song" + "&type=video")
-            .subscribe(
-              (response) => {
-                const result = (response as any).items[0];
-                result.snippet.title = this.fixStringFormatting(
-                  result.snippet.title
-                );
-                this.cacheSearch("spotify+" + query, response, true);
-                // Turn into function?
-                song.id = result.id.videoId;
-                song.url = "https://www.youtube.com/watch?v=" + song.id;
-                song.youtubeTitle = result.snippet.title;
+    //       const date = new Date();
+    //       const uid = this.auth.user.value.id;
+    //       const ref = this.firestore
+    //         .collection("users/" + uid + "/favorites")
+    //         .doc(song.id);
+    //       if (this.isFavorite(song.id)) {
+    //         const index = this.userFavorites
+    //           .getValue()
+    //           .findIndex((a) => song.id == a.id);
+    //         this.userFavorites.getValue().splice(index, 1);
+    //         ref.delete();
+    //       } else {
+    //         this.userFavorites.getValue().push(song);
+    //         ref.set({ ...song, date });
+    //       }
+    //     } else {
+    //       this.http
+    //         .get(this.youtubeSearchPath + query + "+song" + "&type=video")
+    //         .subscribe(
+    //           (response) => {
+    //             const result = (response as any).items[0];
+    //             result.snippet.title = this.fixStringFormatting(
+    //               result.snippet.title
+    //             );
+    //             this.cacheSearch("spotify+" + query, response, true);
+    //             // Turn into function?
+    //             song.id = result.id.videoId;
+    //             song.url = "https://www.youtube.com/watch?v=" + song.id;
+    //             song.youtubeTitle = result.snippet.title;
 
-                const date = new Date();
-                const uid = this.auth.user.value.id;
-                const ref = this.firestore
-                  .collection("users/" + uid + "/favorites")
-                  .doc(song.id);
+    //             const date = new Date();
+    //             const uid = this.auth.user.value.id;
+    //             const ref = this.firestore
+    //               .collection("users/" + uid + "/favorites")
+    //               .doc(song.id);
 
-                if (this.isFavorite(song.id)) {
-                  const index = this.userFavorites
-                    .getValue()
-                    .findIndex((a) => song.id == a.id);
-                  this.userFavorites.getValue().splice(index, 1);
-                  ref.delete();
-                } else {
-                  this.userFavorites.getValue().push(song);
-                  ref.set({ ...song, date });
-                }
-              },
-              (error) => console.error(error)
-            );
-        }
-      });
+    //             if (this.isFavorite(song.id)) {
+    //               const index = this.userFavorites
+    //                 .getValue()
+    //                 .findIndex((a) => song.id == a.id);
+    //               this.userFavorites.getValue().splice(index, 1);
+    //               ref.delete();
+    //             } else {
+    //               this.userFavorites.getValue().push(song);
+    //               ref.set({ ...song, date });
+    //             }
+    //           },
+    //           (error) => console.error(error)
+    //         );
+    //     }
+    //   });
   }
 
   searchSpotify(query: string): void {

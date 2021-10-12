@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
-import { AngularFirestore } from "@angular/fire/firestore";
-import { AngularFireAuth } from "@angular/fire/auth";
-import { AngularFireFunctions } from "@angular/fire/functions";
+// import { AngularFirestore } from "@angular/fire/firestore";
+// import { AngularFireAuth } from "@angular/fire/auth";
+// import { AngularFireFunctions } from "@angular/fire/functions";
 import { CookieService } from "ngx-cookie-service";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Router } from "@angular/router";
@@ -51,67 +51,67 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private fireAuth: AngularFireAuth,
-    private fireFunctions: AngularFireFunctions,
-    private firestore: AngularFirestore
+    // private fireAuth: AngularFireAuth,
+    // private fireFunctions: AngularFireFunctions,
+    // private firestore: AngularFirestore
   ) {}
 
   firebaseSignIn(user: any) {
-    this.fireFunctions
-      .httpsCallable("getUserToken")({ userId: user.id })
-      .subscribe(async (res) => {
-        if (res.status == 400) {
-          console.log(res.msg);
-        } else if (res.customToken) {
-          console.log("Signing user in...");
-          await this.fireAuth.auth.signInWithCustomToken(res.customToken);
-          console.log(this.fireAuth.auth.currentUser.uid);
-          this.user.next(user);
-          // Load access tokens from Firebase
-          this.loadUserData(user);
-        }
-      });
+    // this.fireFunctions
+    //   .httpsCallable("getUserToken")({ userId: user.id })
+    //   .subscribe(async (res) => {
+    //     if (res.status == 400) {
+    //       console.log(res.msg);
+    //     } else if (res.customToken) {
+    //       console.log("Signing user in...");
+    //       await this.fireAuth.auth.signInWithCustomToken(res.customToken);
+    //       console.log(this.fireAuth.auth.currentUser.uid);
+    //       this.user.next(user);
+    //       // Load access tokens from Firebase
+    //       this.loadUserData(user);
+    //     }
+    //   });
   }
   async uploadAuthData(id: string, url: string, code: string) {
     console.log("Uploading auth data...");
-    await this.firestore
-      .collection("temp")
-      .doc(id)
-      .set({ url: url, code: code }, { merge: true });
+    // await this.firestore
+    //   .collection("temp")
+    //   .doc(id)
+    //   .set({ url: url, code: code }, { merge: true });
   }
 
   async desktopAuthorize(id: string, type: string) {
     this.isElectron = true;
-    await this.firestore
-      .collection("temp")
-      .doc(id)
-      .set({ type: type }, { merge: true })
-      .then(() => {
-        // Set up listener
-        console.log("Listening...");
-        this.authSub = this.firestore
-          .collection("temp")
-          .doc(id)
-          .snapshotChanges()
-          .subscribe((snapshot) => {
-            // TODO: Create object for authData
-            const data = snapshot.payload.data() as any;
-            if (data.url && data.code) {
-              if (data.type === "discord") {
-                console.log("User authenticated!");
-                this.authorizeDiscord(data.url, data.code);
-                this.authSub.unsubscribe();
-              } else if (data.type === "spotify") {
-                this.authorizeSpotify(data.url, data.code);
-                this.authSub.unsubscribe();
-              } else if (data.type === "youtube") {
-                this.authorizeYoutube(data.url, data.code);
-                this.authSub.unsubscribe();
-              }
-              this.firestore.collection("temp").doc(id).delete();
-            }
-          });
-      });
+    // await this.firestore
+    //   .collection("temp")
+    //   .doc(id)
+    //   .set({ type: type }, { merge: true })
+    //   .then(() => {
+    //     // Set up listener
+    //     console.log("Listening...");
+    //     this.authSub = this.firestore
+    //       .collection("temp")
+    //       .doc(id)
+    //       .snapshotChanges()
+    //       .subscribe((snapshot) => {
+    //         // TODO: Create object for authData
+    //         const data = snapshot.payload.data() as any;
+    //         if (data.url && data.code) {
+    //           if (data.type === "discord") {
+    //             console.log("User authenticated!");
+    //             this.authorizeDiscord(data.url, data.code);
+    //             this.authSub.unsubscribe();
+    //           } else if (data.type === "spotify") {
+    //             this.authorizeSpotify(data.url, data.code);
+    //             this.authSub.unsubscribe();
+    //           } else if (data.type === "youtube") {
+    //             this.authorizeYoutube(data.url, data.code);
+    //             this.authSub.unsubscribe();
+    //           }
+    //           this.firestore.collection("temp").doc(id).delete();
+    //         }
+    //       });
+    //   });
   }
 
   authorize(url: string, code: string): void {
@@ -175,7 +175,7 @@ export class AuthService {
         localStorage.clear();
         console.error(error);
         this.authenticated.next(false);
-        this.fireAuth.auth.signOut();
+        // this.fireAuth.auth.signOut();
       }
     );
   }
@@ -204,7 +204,7 @@ export class AuthService {
       (error) => {
         console.error(error);
         this.authenticated.next(false);
-        this.fireAuth.auth.signOut();
+        // this.fireAuth.auth.signOut();
       }
     );
   }
@@ -291,42 +291,42 @@ export class AuthService {
       ).toString();
       user.youtubeRefreshToken = localStorage.getItem("youtube-refresh-token");
     }
-    await this.firestore
-      .collection("users")
-      .doc(user.id)
-      .set(user, { merge: true });
+    // await this.firestore
+    //   .collection("users")
+    //   .doc(user.id)
+    //   .set(user, { merge: true });
   }
 
   loadUserData(user: any): void {
-    this.firestore
-      .collection("users")
-      .doc(user.id)
-      .get()
-      .subscribe((docSnapshot) => {
-        let data = docSnapshot.data();
-        if (!localStorage.getItem("spotify-token") && data.spotifyAccessToken) {
-          this.spotifyAccessToken = data.spotifyAccessToken;
-          localStorage.setItem("spotify-token", data.spotifyAccessToken);
-          localStorage.setItem("spotify-expiration", data.spotifyExpiration);
-          localStorage.setItem(
-            "spotify-refresh-token",
-            data.spotifyRefreshToken
-          );
+    // this.firestore
+    //   .collection("users")
+    //   .doc(user.id)
+    //   .get()
+    //   .subscribe((docSnapshot) => {
+    //     let data = docSnapshot.data();
+    //     if (!localStorage.getItem("spotify-token") && data.spotifyAccessToken) {
+    //       this.spotifyAccessToken = data.spotifyAccessToken;
+    //       localStorage.setItem("spotify-token", data.spotifyAccessToken);
+    //       localStorage.setItem("spotify-expiration", data.spotifyExpiration);
+    //       localStorage.setItem(
+    //         "spotify-refresh-token",
+    //         data.spotifyRefreshToken
+    //       );
 
-          this.authorizeSpotify();
-        }
-        if (!localStorage.getItem("youtube-token") && data.youtubeAccessToken) {
-          this.youtubeAccessToken = data.youtubeAccessToken;
-          localStorage.setItem("youtube-token", data.youtubeAccessToken);
-          localStorage.setItem("youtube-expiration", data.youtubeExpiration);
-          localStorage.setItem(
-            "youtube-refresh-token",
-            data.youtubeRefreshToken
-          );
+    //       this.authorizeSpotify();
+    //     }
+    //     if (!localStorage.getItem("youtube-token") && data.youtubeAccessToken) {
+    //       this.youtubeAccessToken = data.youtubeAccessToken;
+    //       localStorage.setItem("youtube-token", data.youtubeAccessToken);
+    //       localStorage.setItem("youtube-expiration", data.youtubeExpiration);
+    //       localStorage.setItem(
+    //         "youtube-refresh-token",
+    //         data.youtubeRefreshToken
+    //       );
 
-          this.authorizeYoutube();
-        }
-      });
+    //       this.authorizeYoutube();
+    //     }
+    //   });
   }
 
   // Spotify
